@@ -1,188 +1,44 @@
-<!DOCTYPE html>
-<html lang="te">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="MANA360 - Telugu latest updates, AI, Technology, YouTube, Business, Education and News">
-  <title>MANA360 | Think Telugu. Think Better.</title>
-  <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    :root{
-      --navy:#07152f;--blue:#2563eb;--cyan:#09b7ef;--purple:#6d28d9;
-      --pink:#ec4899;--orange:#ff7a18;--text:#10203f;--muted:#64748b;
-      --bg:#f7f9fc;--card:#fff;--border:#e8edf5;
-    }
-    body{font-family:Arial,"Noto Sans Telugu",sans-serif;background:var(--bg);color:var(--text);line-height:1.55}
-    a{text-decoration:none;color:inherit}
-    .topbar{height:38px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 4%;font-size:13px}
-    .social{display:flex;gap:16px;opacity:.95}
-    .header{background:#fff;padding:18px 4%;display:flex;align-items:center;gap:45px;border-bottom:1px solid var(--border)}
-    .logo{font-size:43px;font-weight:900;letter-spacing:-2px;color:#2470e8}
-    .logo span{color:#ff7a18}.tagline{display:block;font-size:11px;color:#64748b;text-align:center;letter-spacing:.4px}
-    .search{height:46px;flex:1;max-width:590px;border:1px solid var(--border);border-radius:28px;display:flex;align-items:center;padding-left:20px;color:#718096;box-shadow:0 5px 18px #0b1b3a0c}
-    .search button{margin-left:auto;border:0;width:46px;height:46px;border-radius:50%;background:#2563eb;color:white;font-size:20px;cursor:pointer}
-    .menu-btn{border:0;background:linear-gradient(90deg,#ef3f91,#7c3aed);color:#fff;padding:13px 24px;border-radius:28px;font-weight:700;font-size:15px}
-    .nav{background:#fff;display:flex;justify-content:center;gap:30px;padding:13px 3%;border-bottom:1px solid var(--border);font-weight:700;font-size:14px;overflow:auto}
-    .nav a{white-space:nowrap}.nav a:first-child{color:#175de8;border-bottom:3px solid #2563eb;padding-bottom:10px}
-    .wrap{width:min(1180px,92%);margin:20px auto}
-    .hero-grid{display:grid;grid-template-columns:2.35fr 1fr;gap:18px}
-    .hero{min-height:380px;border-radius:18px;padding:42px;position:relative;overflow:hidden;color:#fff;background:
-      radial-gradient(circle at 75% 20%,#2d6dff55,transparent 22%),
-      radial-gradient(circle at 90% 80%,#06c8ff44,transparent 25%),
-      linear-gradient(135deg,#06245d,#073da4 58%,#111a70)}
-    .hero:after{content:"";position:absolute;width:330px;height:330px;border-radius:50%;right:-90px;bottom:-130px;border:2px solid #ffffff1a;box-shadow:0 0 0 45px #ffffff08,0 0 0 90px #ffffff05}
-    .badge{display:inline-block;background:linear-gradient(90deg,#ff7a18,#ec4899);padding:7px 14px;border-radius:18px;font-weight:800;font-size:13px;margin-bottom:18px}
-    h1{font-size:39px;line-height:1.18;max-width:720px;position:relative;z-index:2}
-    .hero p{font-size:16px;max-width:620px;margin:18px 0;color:#e5efff;position:relative;z-index:2}
-    .cta{display:inline-block;background:linear-gradient(90deg,#08b9ef,#6840ed);padding:13px 24px;border-radius:28px;font-weight:800;position:relative;z-index:2}
-    .robot{position:absolute;right:35px;bottom:24px;font-size:145px;filter:drop-shadow(0 12px 30px #0005);opacity:.92}
-    .hero-meta{margin-top:24px;font-size:13px;color:#d9e7ff}
-    .side{display:grid;gap:14px}
-    .side-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:15px;display:flex;gap:14px;align-items:center;box-shadow:0 8px 25px #0b1b3a0a}
-    .thumb{width:105px;height:88px;border-radius:12px;display:grid;place-items:center;font-size:38px;flex:none;background:linear-gradient(135deg,#dbeafe,#eef2ff)}
-    .side-card h3{font-size:15px;line-height:1.35}.pill{display:inline-block;font-size:11px;font-weight:800;padding:4px 9px;border-radius:12px;background:#dbeafe;color:#2563eb;margin-bottom:5px}
-    .section-head{display:flex;justify-content:space-between;align-items:center;margin:28px 0 12px}
-    .section-head h2{font-size:24px}.view{color:#315ee9;font-weight:700}
-    .categories{display:flex;gap:12px;overflow:auto;padding-bottom:4px}
-    .cat{background:#fff;border:1px solid var(--border);border-radius:13px;padding:13px 22px;white-space:nowrap;font-weight:800;box-shadow:0 5px 18px #0b1b3a08}
-    .cat:hover{transform:translateY(-2px);transition:.2s}
-    .content-grid{display:grid;grid-template-columns:3fr 1fr;gap:20px}
-    .tabs{display:flex;gap:24px;justify-content:flex-end;margin-bottom:10px;color:#64748b;font-weight:700}
-    .tabs b{color:#2563eb;border-bottom:3px solid #2563eb;padding-bottom:8px}
-    .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-    .card{background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 8px 25px #0b1b3a0b}
-    .card-img{height:165px;display:grid;place-items:center;color:#fff;font-size:42px;font-weight:900;background:linear-gradient(135deg,#07152f,#1d4ed8)}
-    .card:nth-child(2) .card-img{background:linear-gradient(135deg,#111827,#334155)}
-    .card:nth-child(3) .card-img{background:linear-gradient(135deg,#be123c,#7c3aed)}
-    .card-body{padding:15px}.card h3{font-size:17px;line-height:1.4;margin:7px 0}
-    .card p{font-size:13px;color:#64748b}.meta{font-size:11px;color:#718096;margin-top:12px}
-    .sidebar{display:grid;gap:15px;align-content:start}
-    .widget{background:#fff;border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:0 8px 25px #0b1b3a0b}
-    .widget h3{margin-bottom:10px}.widget p{font-size:13px;color:#64748b}
-    .email{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;margin:12px 0}
-    .subscribe{width:100%;border:0;padding:12px;border-radius:10px;color:#fff;font-weight:800;background:linear-gradient(90deg,#f43f87,#8b3ff2)}
-    .trends li{list-style:none;padding:7px 0;font-size:14px}.trends li:before{content:"#";color:#2563eb;font-weight:900;margin-right:9px}
-    footer{margin-top:35px;background:var(--navy);color:#fff}
-    .quote{padding:13px;text-align:center;background:linear-gradient(90deg,#315ee9,#7c3aed,#ff7a18);font-weight:700}
-    .foot{padding:22px 4%;display:flex;justify-content:space-between;gap:20px;font-size:13px;color:#d8e2f4}.foot-links{display:flex;gap:20px}
-    @media(max-width:900px){
-      .header{gap:15px;flex-wrap:wrap}.search{order:3;max-width:none;flex-basis:100%}
-      .hero-grid,.content-grid{grid-template-columns:1fr}.cards{grid-template-columns:repeat(2,1fr)}
-      .hero{min-height:390px}.robot{right:10px;opacity:.35}
-    }
-    @media(max-width:600px){
-      .topbar{font-size:11px}.social{display:none}.logo{font-size:34px}.header{padding:14px 4%}
-      .nav{justify-content:flex-start;gap:20px}.wrap{width:94%}.hero{padding:28px 22px;min-height:420px}
-      h1{font-size:29px}.hero p{font-size:14px}.robot{font-size:100px;bottom:12px}
-      .cards{grid-template-columns:1fr}.tabs{justify-content:flex-start;overflow:auto}.side-card .thumb{width:85px}
-      .foot{flex-direction:column}.foot-links{flex-wrap:wrap}
-    }
-  </style>
-</head>
-<body>
+<!doctype html><html lang="te"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MANA360 – Telugu News, AI, Technology, Movies & More</title><meta name="description" content="MANA360 – Telugu News, Technology, AI, YouTube, Business, Movies, Movie Reviews, Movie News, AI Stories, Education and more."><link rel="canonical" href="https://www.mana360.in/"><link rel="stylesheet" href="assets/style.css"></head><body>
+<div class="top"><div class="container"><span>🚀 Telugu lo Latest Updates, Smarter Tomorrow!</span><span>Follow Us &nbsp; ▶️ &nbsp; 📸 &nbsp; 𝕏 &nbsp; ✈️ &nbsp; 🟢</span></div></div>
+<header class="header"><div class="container head"><a class="logo" href="index.html">MANA<b>360</b><span class="tag">Think Telugu. Think Better.</span></a><form class="search" onsubmit="siteSearch(event)"><input id="searchBox" placeholder="Search articles, news, tips..."><button>⌕</button></form><button class="menu-btn" onclick="toggleNav()">☰ Menu</button></div></header>
+<nav class="nav" id="mobileNav"><div class="container"><a class="active" href="index.html">🏠 Home</a><a class="" href="index.html#trending">🔥 Trending</a><a class="" href="index.html#latest">📰 Latest</a><a class="" href="categories/news.html">📰 News</a><a class="" href="categories/tech.html">📱 Tech</a><a class="" href="categories/ai.html">🤖 AI</a><a class="" href="categories/youtube.html">🎬 YouTube</a><a class="" href="categories/business.html">📈 Business</a><a class="" href="categories/education.html">🎓 Education</a><a class="" href="categories/devotional.html">🛕 Devotional</a><a class="" href="categories/stories.html">📖 Stories</a><a class="" href="categories/movie-reviews.html">🎞️ Movie Reviews</a><a class="" href="categories/movie-news.html">🗞️ Movie News</a><a class="" href="categories/ai-stories.html">🤖📖 AI Stories</a><a class="" href="categories/tips.html">💡 Tips</a><a class="" href="categories/offers.html">🏷️ Offers</a></div></nav>
+<main class="container">
+<section class="hero" id="trending"><div class="hero-grid">
+<article class="hero-main"><span class="badge">🔥 Trending Now</span><h1>AI, Technology & Telugu ప్రపంచంలోని తాజా <span style="color:#ffb62f">Updates</span></h1><p>సులభమైన తెలుగులో latest news, AI, technology, YouTube, business, movies మరియు useful stories తెలుసుకోండి.</p><a href="categories/movie-news.html" style="display:inline-block;width:max-content;background:linear-gradient(90deg,#08b9ef,#7137e8);padding:12px 22px;border-radius:25px;font-weight:850;position:relative;z-index:2">Explore Latest →</a><div class="meta">MANA360 Team | Aug 11, 2026</div></article>
+<div class="side-list">
+<a class="side-card" href="categories/movie-reviews.html"><div class="side-icon">🎬</div><div class="side-body"><span class="category">Movie Reviews</span><h3>కొత్త Movie Reviews, కథ & performance insights</h3><div class="date">New Category</div></div></a>
+<a class="side-card" href="categories/movie-news.html"><div class="side-icon">🗞️</div><div class="side-body"><span class="category">Movie News</span><h3>Telugu Cinemaలో latest official updates</h3><div class="date">New Category</div></div></a>
+<a class="side-card" href="categories/ai-stories.html"><div class="side-icon">🤖</div><div class="side-body"><span class="category">AI Stories</span><h3>AI, imagination & emotions కలిసిన తెలుగు కథలు</h3><div class="date">New Category</div></div></a>
+</div></div></section>
 
-  <div class="topbar">
-    <div>🚀 Telugu lo Latest Updates, Smarter Tomorrow!</div>
-    <div class="social">Follow Us &nbsp; ▶️ &nbsp; 📸 &nbsp; 𝕏 &nbsp; ✈️ &nbsp; 🟢</div>
-  </div>
+<section class="section" id="latest"><div class="section-head"><h2>Latest Updates</h2><a class="view" href="search.html">View All →</a></div><div class="grid">
+<a class="card" href="articles/ai-ante-emiti-ai-ela-upayogapadutundi.html"><div class="card-image">🤖</div><div class="card-body"><span class="category">AI</span><h3>AI అంటే ఏమిటి? రోజువారీ జీవితంలో AI ఎలా ఉపయోగపడుతోంది?</h3><div class="date">Aug 10, 2026</div></div></a>
+<a class="card" href="articles/chatgpt-telugu-7-simple-ways.html"><div class="card-image">💬</div><div class="card-body"><span class="category">AI</span><h3>ChatGPTని తెలుగులో ఉపయోగించడానికి 7 సింపుల్ మార్గాలు</h3><div class="date">Aug 10, 2026</div></div></a>
+<a class="card" href="articles/smartphone-konetappudu-8-vishayalu.html"><div class="card-image">📱</div><div class="card-body"><span class="category">Tech</span><h3>కొత్త Smartphone కొనేటప్పుడు తప్పక చూడాల్సిన 8 విషయాలు</h3><div class="date">Aug 10, 2026</div></div></a>
+<a class="card" href="articles/movie-review-guide.html"><div class="card-image">🎬</div><div class="card-body"><span class="category">Movie Reviews</span><h3>Movie Review ఎలా చేయాలి? కథ నుంచి నటన వరకు ఏమేమి చూడాలి?</h3><div class="date">Aug 11, 2026</div></div></a>
+<a class="card" href="articles/movie-news-guide.html"><div class="card-image">🗞️</div><div class="card-body"><span class="category">Movie News</span><h3>Movie News: Official Updatesని ఎలా గుర్తించాలి?</h3><div class="date">Aug 11, 2026</div></div></a>
+<a class="card" href="articles/ai-story-robot-friend.html"><div class="card-image">🤖📖</div><div class="card-body"><span class="category">AI Stories</span><h3>AI Story: ఆ చిన్న Robotకు ఒక పెద్ద కల</h3><div class="date">Aug 11, 2026</div></div></a>
+<a class="card" href="articles/youtube-thumbnail-ela-tayaru-cheyali.html"><div class="card-image">🎬</div><div class="card-body"><span class="category">YouTube</span><h3>YouTube వీడియోకి మంచి Thumbnail ఎలా తయారు చేయాలి?</h3><div class="date">Aug 9, 2026</div></div></a>
+<a class="card" href="articles/small-business-ideas-7.html"><div class="card-image">📈</div><div class="card-body"><span class="category">Business</span><h3>తక్కువ పెట్టుబడితో ప్రారంభించగల 7 చిన్న Business Ideas</h3><div class="date">Aug 8, 2026</div></div></a>
+</div></section>
 
-  <header class="header">
-    <a href="index.html">
-      <div class="logo">MANA<span>360</span></div>
-      <div class="tagline">Think Telugu. Think Better.</div>
-    </a>
-    <div class="search">
-      <span>Search articles, news, tips...</span>
-      <button onclick="alert('Search feature can be connected here!')">⌕</button>
-    </div>
-    <button class="menu-btn">☰ &nbsp; Menu</button>
-  </header>
+<section class="section"><div class="section-head"><h2>Explore Categories</h2><a class="view" href="search.html">View All →</a></div><div class="categories">
+<a class="cat-box c1" href="categories/news.html"><span class="icon">📰</span>News<small>12 Articles</small></a>
+<a class="cat-box c2" href="categories/tech.html"><span class="icon">📱</span>Tech<small>18 Articles</small></a>
+<a class="cat-box c3" href="categories/ai.html"><span class="icon">🤖</span>AI<small>10 Articles</small></a>
+<a class="cat-box c4" href="categories/youtube.html"><span class="icon">🎬</span>YouTube<small>15 Articles</small></a>
+<a class="cat-box c5" href="categories/business.html"><span class="icon">📈</span>Business<small>8 Articles</small></a>
+<a class="cat-box c6" href="categories/education.html"><span class="icon">🎓</span>Education<small>14 Articles</small></a>
+<a class="cat-box c7" href="categories/devotional.html"><span class="icon">🛕</span>Devotional<small>9 Articles</small></a>
+<a class="cat-box c8" href="categories/stories.html"><span class="icon">📖</span>Stories<small>11 Articles</small></a>
+<a class="cat-box c9" href="categories/tips.html"><span class="icon">💡</span>Tips<small>13 Articles</small></a>
+<a class="cat-box c10" href="categories/offers.html"><span class="icon">🏷️</span>Offers<small>7 Articles</small></a>
+<a class="cat-box c11" href="categories/movie-reviews.html"><span class="icon">🎞️</span>Movie Reviews<small>New</small></a>
+<a class="cat-box c12" href="categories/movie-news.html"><span class="icon">🗞️</span>Movie News<small>New</small></a>
+<a class="cat-box c13" href="categories/ai-stories.html"><span class="icon">🤖📖</span>AI Stories<small>New</small></a>
+</div></section>
 
-  <nav class="nav">
-    <a href="index.html">🏠 Home</a>
-    <a href="articles/">🔥 Trending</a>
-    <a href="articles/">◷ Latest</a>
-    <a href="categories/">▣ News</a>
-    <a href="ai.html">⚙️ Tech</a>
-    <a href="ai.html">🤖 AI</a>
-    <a href="ai.html">▶ YouTube</a>
-    <a href="business.html">📈 Business</a>
-    <a href="education.html">🎓 Education</a>
-    <a href="devotional.html">🙏 Devotional</a>
-    <a href="categories/">✣ More⌄</a>
-  </nav>
-
-  <main class="wrap">
-    <section class="hero-grid">
-      <article class="hero">
-        <div class="badge">🔥 Trending Now</div>
-        <h1>AI, Technology & Telugu<br>ప్రపంచంలోని తాజా <span style="color:#ffb43b">Updates</span></h1>
-        <p>సమాచారం తెలుగులో — మీ కోసం AI, Technology, YouTube, Business మరియు మరిన్ని ఉపయోగకరమైన విషయాలు ఒకే చోట.</p>
-        <a class="cta" href="articles/">Explore Latest &nbsp; →</a>
-        <div class="hero-meta">◉ MANA360 Team &nbsp; | &nbsp; 📅 Aug 10, 2025</div>
-        <div class="robot">🤖</div>
-      </article>
-
-      <div class="side">
-        <a class="side-card" href="ai-phone-features-useful-aa.html">
-          <div class="thumb">📱</div><div><span class="pill">Technology</span><h3>5 బెస్ట్ Smartphones 2025 లో — మీ కోసం పూర్తి Guide</h3><small>📅 Aug 10, 2025</small></div>
-        </a>
-        <a class="side-card" href="chatgpt-telugu-7-simple-ways.html">
-          <div class="thumb">🎬</div><div><span class="pill" style="background:#fee2e2;color:#ef4444">YouTube</span><h3>YouTube Thumbnail ఎలా డిజైన్ చేయాలి? (Step by Step)</h3><small>📅 Aug 9, 2025</small></div>
-        </a>
-        <a class="side-card" href="business.html">
-          <div class="thumb">📈</div><div><span class="pill" style="background:#dcfce7;color:#16a34a">Business</span><h3>2025 లో బిజినెస్ పెట్టుబడితో 5 బిజినెస్ Ideas</h3><small>📅 Aug 8, 2025</small></div>
-        </a>
-      </div>
-    </section>
-
-    <div class="section-head"><h2>Explore by Category</h2><a class="view" href="categories/">View All →</a></div>
-    <div class="categories">
-      <a class="cat" href="ai.html">🤖 AI</a><a class="cat" href="ai.html">💻 Technology</a><a class="cat" href="ai.html">▶️ YouTube</a>
-      <a class="cat" href="business.html">📊 Business</a><a class="cat" href="education.html">🎓 Education</a>
-      <a class="cat" href="devotional.html">🙏 Devotional</a><a class="cat" href="categories/">📰 News</a>
-    </div>
-
-    <div class="section-head"><h2>Latest Updates</h2></div>
-    <div class="content-grid">
-      <section>
-        <div class="tabs"><b>All</b><span>Trending</span><span>Popular</span><span>Latest</span></div>
-        <div class="cards">
-          <a class="card" href="chatgpt-telugu-7-simple-ways.html">
-            <div class="card-img">◉<br><span style="font-size:27px">ChatGPT</span></div>
-            <div class="card-body"><span class="pill">AI</span><h3>ChatGPT ని తెలుగులో ఎలా ఉపయోగించాలి – 7 Simple Tips</h3><p>ChatGPT మీ రోజువారీ పనులను ఎలా సులభతరం చేస్తుందో తెలుగులో పూర్తి గైడ్.</p><div class="meta">📅 Aug 10, 2025 &nbsp; • &nbsp; 👁 2.4K views &nbsp; • &nbsp; 5 min read</div></div>
-          </a>
-          <a class="card" href="ai-phone-features-useful-aa.html">
-            <div class="card-img">📱<br><span style="font-size:25px">Top 5 Smartphones 2025</span></div>
-            <div class="card-body"><span class="pill">Technology</span><h3>2025 లో కొనాల్సిన Top 5 Smartphones – Full Comparison</h3><p>ధర, ఫీచర్స్, బ్యాటరీ & కెమెరా పరంగా టాప్ ఫోన్ల పూర్తి విశ్లేషణ.</p><div class="meta">📅 Aug 9, 2025 &nbsp; • &nbsp; 👁 3.1K views &nbsp; • &nbsp; 6 min read</div></div>
-          </a>
-          <a class="card" href="ai-ante-emit-ai-ela-upayogapadutundi.html">
-            <div class="card-img">▶<br><span style="font-size:24px">BETTER THUMBNAIL</span></div>
-            <div class="card-body"><span class="pill" style="background:#fee2e2;color:#ef4444">YouTube</span><h3>YouTube Thumbnail ఎలా డిజైన్ చేయాలి? (Complete Guide)</h3><p>More Views, More Subscribers కోసం Thumbnail Tips — తెలుగులో.</p><div class="meta">📅 Aug 8, 2025 &nbsp; • &nbsp; 👁 4.2K views &nbsp; • &nbsp; 7 min read</div></div>
-          </a>
-        </div>
-      </section>
-
-      <aside class="sidebar">
-        <div class="widget">
-          <h3>✉️ Stay Updated!</h3><p>Get the latest articles directly to your inbox.</p>
-          <input class="email" type="email" placeholder="Enter your email">
-          <button class="subscribe" onclick="alert('Thank you for subscribing!')">Subscribe →</button>
-        </div>
-        <div class="widget trends">
-          <h3>🔥 Trending Topics</h3>
-          <ul><li>ChatGPT in Telugu</li><li>Best Smartphones 2025</li><li>YouTube Growth Tips</li><li>Small Business Ideas</li><li>AI Tools for Students</li></ul>
-        </div>
-      </aside>
-    </div>
-  </main>
-
-  <footer>
-    <div class="quote">“Better Information. A Smarter You. ❤️ MANA360”</div>
-    <div class="foot">
-      <div>© 2025 MANA360. All rights reserved. &nbsp; | &nbsp; Made with ❤️ for Telugu Readers</div>
-      <div class="foot-links"><a href="about.html">About</a><a href="contact.html">Contact</a><a href="disclaimer.html">Privacy Policy</a><a href="disclaimer.html">Terms</a></div>
-    </div>
-  </footer>
-</body>
-</html>
+<section class="newsletter"><div><h2>📩 MANA360 Updates మిస్ అవ్వకండి!</h2><p>కొత్త Telugu articles, Movie News & AI Stories కోసం subscribe చేయండి.</p></div><form onsubmit="subscribeUser(event)"><input type="email" required placeholder="మీ email"><button>Subscribe</button></form></section>
+</main>
+<footer><div class="container footer-grid"><div><div class="logo">MANA<b>360</b></div><p>తెలుగు ప్రజల కోసం useful, simple and reader-friendly సమాచార వేదిక.</p></div><div><h3>Quick Links</h3><ul><li><a href="pages/about.html">About Us</a></li><li><a href="pages/contact.html">Contact Us</a></li><li><a href="pages/privacy-policy.html">Privacy Policy</a></li><li><a href="pages/terms.html">Terms & Conditions</a></li><li><a href="pages/disclaimer.html">Disclaimer</a></li></ul></div><div><h3>New Categories</h3><ul><li><a href="categories/movie-reviews.html">Movie Reviews</a></li><li><a href="categories/movie-news.html">Movie News</a></li><li><a href="categories/ai-stories.html">AI Stories</a></li><li><a href="categories/ai.html">AI</a></li><li><a href="categories/news.html">News</a></li></ul></div><div><h3>Popular Tags</h3><div class="tags"><span>AI</span><span>Technology</span><span>Movies</span><span>Movie Reviews</span><span>Movie News</span><span>AI Stories</span></div></div></div><div class="container copy"><span>© 2026 MANA360. All Rights Reserved.</span><span>Made with ❤️ for Telugu People</span></div></footer>
+<script>function toggleNav(){const n=document.getElementById("mobileNav");n.style.display=n.style.display==="block"?"":"block"}function siteSearch(e){e.preventDefault();const q=document.getElementById("searchBox").value.trim();if(q)location.href="search.html?q="+encodeURIComponent(q)}function subscribeUser(e){e.preventDefault();alert("ధన్యవాదాలు! Newsletter serviceని live email providerతో connect చేయాలి.")}</script></body></html>

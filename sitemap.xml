@@ -32,4 +32,10 @@
 <url><loc>https://www.mana360.in/pages/privacy-policy.html</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
 <url><loc>https://www.mana360.in/pages/terms.html</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
 <url><loc>https://www.mana360.in/pages/disclaimer.html</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>https://www.mana360.in/categories/movie-reviews.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+<url><loc>https://www.mana360.in/categories/movie-news.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+<url><loc>https://www.mana360.in/categories/ai-stories.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+<url><loc>https://www.mana360.in/articles/movie-review-guide.html</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>https://www.mana360.in/articles/movie-news-guide.html</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+<url><loc>https://www.mana360.in/articles/ai-story-robot-friend.html</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
 </urlset>
