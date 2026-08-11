@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="te">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trending | MANA360</title>
+<meta name="description" content="MANA360 Trending – ప్రస్తుతం ట్రెండ్ అవుతున్న తెలుగు వార్తలు, AI, Tech, YouTube, Business మరియు Entertainment updates.">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.trending-page{padding:28px 0 70px}
+.trending-hero{
+  position:relative;overflow:hidden;border-radius:26px;padding:44px;
+  background:linear-gradient(135deg,#061a43 0%,#063b91 48%,#0878df 100%);
+  color:#fff;box-shadow:0 24px 60px rgba(5,46,110,.24);
+}
+.trending-hero:before,.trending-hero:after{
+  content:"";position:absolute;border-radius:50%;pointer-events:none
+}
+.trending-hero:before{width:300px;height:300px;right:-80px;top:-120px;background:rgba(255,255,255,.08)}
+.trending-hero:after{width:240px;height:240px;left:-100px;bottom:-140px;background:rgba(0,198,255,.13)}
+.trending-content{position:relative;z-index:1;max-width:850px}
+.trending-badge{
+  display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:999px;
+  background:#ff2b8a;color:#fff;font-weight:800;font-size:13px;margin-bottom:16px
+}
+.trending-hero h1{font-size:clamp(30px,5vw,52px);line-height:1.15;margin:0 0 14px}
+.trending-hero p{font-size:16px;line-height:1.8;color:#e4efff;margin:0;max-width:760px}
+.trending-date{margin-top:18px;color:#c8ddff;font-size:13px}
+.trending-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:28px}
+.trend-card{
+  display:block;padding:0;overflow:hidden;border-radius:18px;background:#fff;
+  border:1px solid #e4ebf5;box-shadow:0 10px 28px rgba(12,34,68,.08);transition:.2s
+}
+.trend-card:hover{transform:translateY(-5px);box-shadow:0 18px 38px rgba(12,34,68,.13)}
+.trend-image{
+  min-height:135px;display:flex;align-items:center;justify-content:center;font-size:48px;
+  background:linear-gradient(135deg,#082b66,#0878df);color:#fff
+}
+.trend-body{padding:17px}
+.trend-body .category{display:inline-block;font-size:11px;font-weight:800;color:#1262c4;text-transform:uppercase;margin-bottom:7px}
+.trend-body h3{margin:0 0 8px;font-size:17px;line-height:1.5;color:#17243b}
+.trend-body p{margin:0;color:#68758a;font-size:13px;line-height:1.6}
+.trending-head{display:flex;align-items:center;justify-content:space-between;margin-top:34px;gap:12px}
+.trending-head h2{margin:0;font-size:25px}
+.trending-head h2:before{content:"";display:inline-block;width:5px;height:25px;background:#ff2b8a;border-radius:5px;margin-right:10px;vertical-align:-4px}
+.back-home{font-weight:800;color:#1262c4}
+@media(max-width:850px){.trending-grid{grid-template-columns:1fr 1fr}.trending-hero{padding:32px 25px}}
+@media(max-width:560px){.trending-grid{grid-template-columns:1fr}.trending-hero{padding:27px 20px;border-radius:19px}.trending-hero h1{font-size:30px}}
+</style>
+</head>
+<body>
+<div class="top"><div class="container">
+<span>◉ Welcome to MANA360 – మీ కోసం, మీ సమాచారం కోసం</span>
+<span>About Us &nbsp; Contact &nbsp; Privacy Policy</span>
+</div></div>
+
+<header class="header">
+<div class="container head">
+<a class="logo" href="index.html">MANA<b>360</b><span class="tag">మీ కోసం, మీ సమాచార కోసం</span></a>
+<form class="search" onsubmit="siteSearch(event)">
+<input id="searchBox" placeholder="Search articles, news, tips..."><button>⌕</button>
+</form>
+<button class="menu-btn" onclick="toggleMegaMenu()" aria-haspopup="dialog">☰ Menu</button>
+</div>
+</header>
+
+<div class="mega-menu" id="megaMenu" onclick="if(event.target===this) toggleMegaMenu(false)">
+<div class="mega-panel" role="dialog" aria-label="MANA360 All Categories">
+<div class="mega-head"><div><h2>☰ All Categories</h2><p>మీకు కావాల్సిన అన్ని categories ఒకే చోట</p></div>
+<button class="mega-close" onclick="toggleMegaMenu(false)">×</button></div>
+<div class="mega-body">
+<div class="mega-group"><h3>📰 News & Knowledge</h3><div class="mega-links">
+<a class="mega-link" href="categories/news.html"><span class="mi">📰</span>News</a>
+<a class="mega-link" href="categories/tech.html"><span class="mi">📱</span>Tech</a>
+<a class="mega-link" href="categories/ai.html"><span class="mi">🤖</span>AI</a>
+<a class="mega-link" href="categories/youtube.html"><span class="mi">🎬</span>YouTube</a>
+<a class="mega-link" href="categories/business.html"><span class="mi">📈</span>Business</a>
+</div></div>
+<div class="mega-group"><h3>🎯 Entertainment & Lifestyle</h3><div class="mega-links">
+<a class="mega-link" href="categories/education.html"><span class="mi">🎓</span>Education</a>
+<a class="mega-link" href="categories/devotional.html"><span class="mi">🛕</span>Devotional</a>
+<a class="mega-link" href="categories/stories.html"><span class="mi">📖</span>Stories</a>
+<a class="mega-link" href="categories/tips.html"><span class="mi">💡</span>Tips</a>
+<a class="mega-link" href="categories/offers.html"><span class="mi">🏷️</span>Offers</a>
+</div></div>
+<div class="mega-group"><h3>✨ New on MANA360</h3><div class="mega-links">
+<a class="mega-link" href="categories/movie-reviews.html"><span class="mi">🎬</span>Movie Reviews</a>
+<a class="mega-link" href="categories/movie-news.html"><span class="mi">🍿</span>Movie News</a>
+<a class="mega-link" href="categories/ai-stories.html"><span class="mi">🤖📖</span>AI Stories</a>
+</div></div>
+</div>
+<div class="mega-footer"><span>✨ MANA360 — Think Telugu. Think Better.</span><a href="index.html">← Back to Home</a></div>
+</div></div>
+
+<nav class="nav" id="mobileNav"><div class="container">
+<a href="index.html">🏠 Home</a>
+<a class="active" href="trending.html">🔥 Trending</a>
+<a href="index.html#latest">📰 Latest</a>
+<a href="categories/news.html">📰 News</a>
+<a href="categories/tech.html">📱 Tech</a>
+<a href="categories/ai.html">🤖 AI</a>
+<a href="categories/youtube.html">🎬 YouTube</a>
+<a href="categories/business.html">📈 Business</a>
+<a href="categories/movie-reviews.html">🎬 Movies</a>
+<a href="categories/movie-news.html">🍿 Movie News</a>
+<a href="categories/ai-stories.html">🤖 AI Stories</a>
+</div></nav>
+
+<main class="container trending-page">
+<section class="trending-hero">
+<div class="trending-content">
+<span class="trending-badge">🔥 Trending Now</span>
+<h1>ప్రస్తుతం ట్రెండ్ అవుతున్న తాజా విషయాలు</h1>
+<p>AI, Technology, YouTube, Business, Movies మరియు తెలుగు ప్రపంచంలో ప్రస్తుతం ఎక్కువగా చదువుతున్న & మాట్లాడుకుంటున్న updates అన్నీ ఒకే చోట.</p>
+<div class="trending-date">MANA360 Trending • Updated regularly</div>
+</div>
+</section>
+
+<div class="trending-head"><h2>🔥 Trending Updates</h2><a class="back-home" href="index.html">← Home</a></div>
+<section class="trending-grid">
+<a class="trend-card" href="articles/ai-ante-emiti-ai-ela-upayogapadutundi.html"><div class="trend-image">🤖</div><div class="trend-body"><span class="category">AI</span><h3>AI అంటే ఏమిటి? రోజువారీ జీవితంలో AI ఎలా ఉపయోగపడుతోంది?</h3><p>AI గురించి సులభమైన తెలుగులో తెలుసుకోండి.</p></div></a>
+<a class="trend-card" href="articles/smartphone-konetappudu-8-vishayalu.html"><div class="trend-image">📱</div><div class="trend-body"><span class="category">Technology</span><h3>కొత్త Smartphone కొనేటప్పుడు తప్పక చూడాల్సిన 8 విషయాలు</h3><p>Smartphone కొనుగోలు ముందు ఉపయోగపడే practical tips.</p></div></a>
+<a class="trend-card" href="articles/chatgpt-telugu-7-simple-ways.html"><div class="trend-image">💬</div><div class="trend-body"><span class="category">AI Tools</span><h3>ChatGPTని ఉపయోగించడానికి 7 Simple Ways</h3><p>రోజువారీ పనుల్లో AIని smartగా ఉపయోగించండి.</p></div></a>
+<a class="trend-card" href="categories/movie-news.html"><div class="trend-image">🍿</div><div class="trend-body"><span class="category">Movie News</span><h3>సినిమా ప్రపంచంలోని తాజా Movie News</h3><p>Trailers, releases, OTT మరియు entertainment updates.</p></div></a>
+<a class="trend-card" href="categories/movie-reviews.html"><div class="trend-image">🎬</div><div class="trend-body"><span class="category">Movie Reviews</span><h3>కొత్త సినిమాల Reviews & Quick Verdicts</h3><p>చూడాలా? వద్దా? మా spoiler-free reviewలో తెలుసుకోండి.</p></div></a>
+<a class="trend-card" href="categories/ai-stories.html"><div class="trend-image">🤖📖</div><div class="trend-body"><span class="category">AI Stories</span><h3>AIతో రూపొందుతున్న కొత్త కథలు</h3><p>Technology, imagination & storytelling కలిసే కొత్త world.</p></div></a>
+</section>
+</main>
+
+<script>
+function toggleMegaMenu(force){
+ const m=document.getElementById("megaMenu"); if(!m)return;
+ const open=typeof force==="boolean"?force:!m.classList.contains("open");
+ m.classList.toggle("open",open); document.body.style.overflow=open?"hidden":"";
+}
+document.addEventListener("keydown",e=>{if(e.key==="Escape")toggleMegaMenu(false)});
+function siteSearch(e){e.preventDefault();const q=document.getElementById("searchBox").value.trim();if(q)location.href="search.html?q="+encodeURIComponent(q)}
+</script>
+</body>
+</html>
