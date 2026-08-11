@@ -117,3 +117,30 @@ img{max-width:100%;height:auto}
 
 /* V6 category landing consistency */
 .cat-blue-link{display:block;text-decoration:none;color:inherit}
+
+
+.movie-review-page{padding:28px 0 70px}
+.movie-review-hero{border-radius:26px;padding:42px 44px;background:linear-gradient(135deg,#061a43,#063b91 50%,#0878df);color:#fff;box-shadow:0 22px 55px rgba(5,46,110,.22);margin-bottom:24px}
+.review-badge{display:inline-flex;padding:8px 14px;border-radius:999px;background:#ff2b8a;font-weight:800;font-size:13px;margin-bottom:15px}
+.movie-review-hero h1{font-size:clamp(29px,5vw,48px);line-height:1.25;margin:0 0 14px}
+.movie-review-hero p{color:#e4efff;line-height:1.85;font-size:16px;max-width:900px;margin:0}
+.movie-meta{margin-top:18px;color:#c7dcff;font-size:13px}
+.rating-panel{display:flex;align-items:center;gap:18px;margin-top:22px;flex-wrap:wrap}
+.stars{color:#ffd43b;font-size:26px;letter-spacing:2px}
+.rating-number{font-size:23px;font-weight:900}
+.movie-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;align-items:start}
+.review-body{background:#fff;border:1px solid #e4ebf5;border-radius:20px;padding:30px;box-shadow:0 10px 28px rgba(12,34,68,.07)}
+.review-body h2{font-size:24px;color:#10274c;margin:28px 0 10px}
+.review-body h2:first-child{margin-top:0}
+.review-body p{font-size:16px;line-height:2;color:#33445c;margin:0 0 16px}
+.verdict{padding:20px;border-radius:15px;background:#eef6ff;border-left:5px solid #0878df;margin:24px 0}
+.verdict strong{display:block;color:#063b91;margin-bottom:7px}
+.satire{margin-top:28px;padding:22px;border-radius:16px;background:linear-gradient(135deg,#fff4fa,#eef6ff);border:1px dashed #ff2b8a;color:#293a56}
+.satire b{display:block;color:#e21d77;margin-bottom:7px}
+.review-side{background:#061a43;color:#fff;border-radius:20px;padding:22px;position:sticky;top:18px}
+.review-side h3{margin:0 0 14px}
+.review-side .side-rating{font-size:31px;font-weight:900;color:#fff}
+.review-side .side-stars{color:#ffd43b;font-size:22px;margin:4px 0 18px}
+.review-side a{display:block;color:#dcecff;text-decoration:none;padding:10px 0;border-bottom:1px solid #ffffff1c}
+.review-side a:hover{color:#fff}
+@media(max-width:800px){.movie-layout{grid-template-columns:1fr}.review-side{position:static}.movie-review-hero{padding:30px 22px}.review-body{padding:22px 19px}}
