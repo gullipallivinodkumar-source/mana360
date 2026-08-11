@@ -114,3 +114,6 @@ img{max-width:100%;height:auto}
   .hero-main h1{font-size:21px}
   .grid,.categories{grid-template-columns:1fr}
 }
+
+/* V6 category landing consistency */
+.cat-blue-link{display:block;text-decoration:none;color:inherit}
