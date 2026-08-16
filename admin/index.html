@@ -1,65 +1,887 @@
-<!doctype html><html lang="te"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MANA360 Admin</title><style>body{font-family:Arial,sans-serif;background:#f4f7fb;margin:0;color:#17243b}.wrap{max-width:1000px;margin:35px auto;padding:0 18px}.box{background:#fff;border:1px solid #e1e8f2;border-radius:20px;padding:25px;box-shadow:0 10px 30px rgba(10,35,70,.07)}h1{color:#061a43}label{display:block;font-weight:800;margin:16px 0 7px}input,select,textarea{width:100%;box-sizing:border-box;border:1px solid #d5deea;border-radius:10px;padding:12px;font-size:15px}textarea{min-height:100px}.editor{min-height:360px;border:1px solid #d5deea;border-radius:10px;padding:15px;line-height:1.8}.toolbar{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0}.toolbar button{border:1px solid #ccd7e6;background:#fff;border-radius:8px;padding:8px 12px;cursor:pointer}.actions{margin-top:20px;display:flex;gap:10px}.publish{background:#0878df;color:#fff;border:0;border-radius:10px;padding:13px 22px;font-weight:800;cursor:pointer}.clear{background:#eee;border:0;border-radius:10px;padding:13px 18px}.msg{margin-top:16px;padding:12px;border-radius:10px;display:none}.ok{display:block;background:#eaf8ef;color:#166534}.err{display:block;background:#fff0f0;color:#b91c1c}.small{color:#66758b;font-size:13px}@media(max-width:650px){.wrap{margin:15px auto}.box{padding:18px}}</style></head><body><div class="wrap"><div class="box"><h1>📝 MANA360 — New Article</h1><p class="small">ఇక్కడ article రాసి Publish చేస్తే GitHubలో file create అవుతుంది, Home, Category, Search మరియు Sitemap update అవుతాయి.</p>
-<label>Admin Password</label><input id="pw" type="password" placeholder="Cloudflare ADMIN_PASSWORD">
-<label>Article Title</label><input id="title" placeholder="ఉదా: 2026లో Smartphone కొనేటప్పుడు చూడాల్సిన 10 విషయాలు">
-<label>Category</label><select id="cat"><option>AI</option><option>Tech</option><option>News</option><option>YouTube</option><option>Business</option><option>Education</option><option>Devotional</option><option>Stories</option><option>Tips</option><option>Offers</option><option>Movie Reviews</option><option>Movie News</option><option>AI Stories</option></select>
-<label>Short Description</label><textarea id="desc" placeholder="Article గురించి 1–2 lines..."></textarea>
-<label>Slug</label><input id="slug" placeholder="smartphone-konetappudu-10-vishayalu"><p class="small">English letters/numbers/hyphens మాత్రమే. ఖాళీగా వదిలితే title నుంచి auto-generate అవుతుంది.</p>
+```html
+<!doctype html>
+<html lang="te">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MANA360 Admin</title>
+
+<style>
+body{
+  font-family:Arial,sans-serif;
+  background:#f4f7fb;
+  margin:0;
+  color:#17243b
+}
+.wrap{
+  max-width:1000px;
+  margin:35px auto;
+  padding:0 18px
+}
+.box{
+  background:#fff;
+  border:1px solid #e1e8f2;
+  border-radius:20px;
+  padding:25px;
+  box-shadow:0 10px 30px rgba(10,35,70,.07)
+}
+h1{color:#061a43}
+label{
+  display:block;
+  font-weight:800;
+  margin:16px 0 7px
+}
+input,select,textarea{
+  width:100%;
+  box-sizing:border-box;
+  border:1px solid #d5deea;
+  border-radius:10px;
+  padding:12px;
+  font-size:15px
+}
+textarea{min-height:100px}
+.editor{
+  min-height:360px;
+  border:1px solid #d5deea;
+  border-radius:10px;
+  padding:15px;
+  line-height:1.8
+}
+.editor img{
+  max-width:100%;
+  height:auto;
+  display:block;
+  margin:15px auto
+}
+.toolbar{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+  margin:8px 0
+}
+.toolbar button{
+  border:1px solid #ccd7e6;
+  background:#fff;
+  border-radius:8px;
+  padding:8px 12px;
+  cursor:pointer
+}
+.actions{
+  margin-top:20px;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap
+}
+.publish{
+  background:#0878df;
+  color:#fff;
+  border:0;
+  border-radius:10px;
+  padding:13px 22px;
+  font-weight:800;
+  cursor:pointer
+}
+.update{
+  background:#16a34a;
+  color:#fff;
+  border:0;
+  border-radius:10px;
+  padding:13px 22px;
+  font-weight:800;
+  cursor:pointer;
+  display:none
+}
+.clear{
+  background:#eee;
+  border:0;
+  border-radius:10px;
+  padding:13px 18px;
+  cursor:pointer
+}
+.msg{
+  margin-top:16px;
+  padding:12px;
+  border-radius:10px;
+  display:none
+}
+.ok{
+  display:block;
+  background:#eaf8ef;
+  color:#166534
+}
+.err{
+  display:block;
+  background:#fff0f0;
+  color:#b91c1c
+}
+.small{
+  color:#66758b;
+  font-size:13px
+}
+.article-item{
+  padding:12px;
+  border:1px solid #e1e8f2;
+  border-radius:10px;
+  margin:8px 0
+}
+.article-item button{
+  margin-left:10px
+}
+.edit-mode{
+  background:#fff8e6;
+  border:1px solid #f0c36d;
+  padding:12px;
+  border-radius:10px;
+  margin-top:15px;
+  display:none
+}
+@media(max-width:650px){
+  .wrap{margin:15px auto}
+  .box{padding:18px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+<div class="box">
+
+<h1>📝 MANA360 — Article Admin</h1>
+
+<p class="small">
+ఇక్కడ article రాసి Publish చేస్తే GitHubలో file create అవుతుంది.
+</p>
+
+<label>Admin Password</label>
+<input id="pw" type="password" placeholder="Cloudflare ADMIN_PASSWORD">
+
+<label>Article Title</label>
+<input id="title" placeholder="ఉదా: 2026లో Smartphone కొనేటప్పుడు చూడాల్సిన 10 విషయాలు">
+
+<label>Category</label>
+<select id="cat">
+<option>AI</option>
+<option>Tech</option>
+<option>News</option>
+<option>YouTube</option>
+<option>Business</option>
+<option>Education</option>
+<option>Devotional</option>
+<option>Stories</option>
+<option>Tips</option>
+<option>Offers</option>
+<option>Movie Reviews</option>
+<option>Movie News</option>
+<option>AI Stories</option>
+</select>
+
+<label>Short Description</label>
+<textarea id="desc" placeholder="Article గురించి 1–2 lines..."></textarea>
+
+<label>Slug</label>
+<input id="slug" placeholder="smartphone-konetappudu-10-vishayalu">
+
+<p class="small">
+English letters/numbers/hyphens మాత్రమే.
+ఖాళీగా వదిలితే title నుంచి auto-generate అవుతుంది.
+</p>
+
+<div id="editMode" class="edit-mode">
+  ✏️ <b>Edit Mode</b> — మీరు existing articleని edit చేస్తున్నారు.
+</div>
 
 <label>Article Image</label>
-<input id="imageFile" type="file" accept="image/jpeg,image/png,image/webp">
-<button type="button" onclick="uploadImage()">📷 Upload & Insert Image</button>
+
+<input
+  id="imageFile"
+  type="file"
+  accept="image/jpeg,image/png,image/webp"
+>
+
+<button
+  type="button"
+  class="clear"
+  onclick="uploadImage()">
+  📷 Upload & Insert Image
+</button>
+
 <p id="imageMsg" class="small"></p>
 
-<label>Article Content</label><div class="toolbar"><button type="button" onclick="cmd('bold')"><b>Bold</b></button><button type="button" onclick="cmd('formatBlock','h2')">H2</button><button type="button" onclick="cmd('insertUnorderedList')">• List</button><button type="button" onclick="cmd('insertOrderedList')">1. List</button></div><div id="content" class="editor" contenteditable="true"><p>ఇక్కడ మీ article రాయండి...</p></div>
-<div class="actions"><button class="publish" onclick="publish()">🚀 Publish Article</button><button class="clear" onclick="location.reload()">Clear</button></div><div id="msg" class="msg"></div></div></div>
-<script>function cmd(c,v){document.execCommand(c,false,v)}function slugify(s){return s.toLowerCase().trim().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'').slice(0,90)}document.getElementById('title').addEventListener('input',()=>{const s=document.getElementById('slug');if(!s.dataset.edited)s.value=slugify(document.getElementById('title').value)});document.getElementById('slug').addEventListener('input',e=>e.target.dataset.edited='1');async function uploadImage(){
-  const file=document.getElementById('imageFile').files[0];
-  const imageMsg=document.getElementById('imageMsg');
+<label>Article Content</label>
+
+<div class="toolbar">
+  <button type="button" onclick="cmd('bold')">
+    <b>Bold</b>
+  </button>
+
+  <button type="button" onclick="cmd('formatBlock','h2')">
+    H2
+  </button>
+
+  <button type="button" onclick="cmd('insertUnorderedList')">
+    • List
+  </button>
+
+  <button type="button" onclick="cmd('insertOrderedList')">
+    1. List
+  </button>
+</div>
+
+<div
+  id="content"
+  class="editor"
+  contenteditable="true">
+  <p>ఇక్కడ మీ article రాయండి...</p>
+</div>
+
+<div style="margin-top:30px;border-top:1px solid #e1e8f2;padding-top:20px">
+
+<h2>📚 Existing Articles</h2>
+
+<div id="articleList">
+  <button
+    type="button"
+    class="clear"
+    onclick="loadArticles()">
+    📚 Load Existing Articles
+  </button>
+</div>
+
+<div class="actions">
+
+  <button
+    id="publishBtn"
+    class="publish"
+    onclick="publish()">
+    🚀 Publish Article
+  </button>
+
+  <button
+    id="updateBtn"
+    class="update"
+    onclick="updateArticle()">
+    ✏️ Update Article
+  </button>
+
+  <button
+    class="clear"
+    onclick="clearForm()">
+    Clear
+  </button>
+
+</div>
+
+<div id="msg" class="msg"></div>
+
+</div>
+
+</div>
+</div>
+
+<script>
+
+function cmd(c,v){
+  document.execCommand(c,false,v);
+}
+
+
+function slugify(s){
+  return s
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g,'')
+    .replace(/\s+/g,'-')
+    .replace(/-+/g,'-')
+    .replace(/^-|-$/g,'')
+    .slice(0,90);
+}
+
+
+document.getElementById('title').addEventListener('input',()=>{
+  const s=document.getElementById('slug');
+
+  if(!s.dataset.edited){
+    s.value=slugify(
+      document.getElementById('title').value
+    );
+  }
+});
+
+
+document.getElementById('slug').addEventListener(
+  'input',
+  e=>e.target.dataset.edited='1'
+);
+
+
+/* =========================
+   LOAD EXISTING ARTICLES
+========================= */
+
+async function loadArticles(){
+
+  const list=document.getElementById('articleList');
+
+  list.innerHTML='Loading articles...';
+
+  try{
+
+    const r=await fetch('/api/articles',{
+      headers:{
+        'x-admin-password':
+          document.getElementById('pw').value
+      }
+    });
+
+    const j=await r.json();
+
+    if(!r.ok)
+      throw new Error(
+        j.error || 'Failed to load articles'
+      );
+
+    if(!j.articles || !j.articles.length){
+
+      list.innerHTML=
+        '<p class="small">Articles ఏవీ లేవు.</p>';
+
+      return;
+    }
+
+    list.innerHTML=j.articles.map(a=>`
+
+      <div class="article-item">
+
+        <b>${a.name}</b>
+
+        <br>
+
+        <a
+          href="${a.url}"
+          target="_blank">
+          Open Article
+        </a>
+
+        <button
+          type="button"
+          class="clear"
+          onclick="editArticle('${a.slug}')">
+          ✏️ Edit
+        </button>
+
+      </div>
+
+    `).join('');
+
+  }catch(e){
+
+    list.innerHTML=
+      '<p style="color:#b91c1c">❌ '
+      +e.message+
+      '</p>';
+
+  }
+}
+
+
+/* =========================
+   EDIT ARTICLE
+========================= */
+
+async function editArticle(slug){
+
+  try{
+
+    const r=await fetch(
+      '/api/article?slug='+
+      encodeURIComponent(slug),
+      {
+        headers:{
+          'x-admin-password':
+            document.getElementById('pw').value
+        }
+      }
+    );
+
+    const j=await r.json();
+
+    if(!r.ok)
+      throw new Error(
+        j.error || 'Failed to load article'
+      );
+
+    const parser=new DOMParser();
+
+    const doc=
+      parser.parseFromString(
+        j.content,
+        'text/html'
+      );
+
+    const titleText=
+      doc.querySelector(
+        '.article-hero h1'
+      )?.textContent.trim() || '';
+
+    const descriptionText=
+      doc.querySelector(
+        '.article-hero p'
+      )?.textContent.trim() || '';
+
+    const badgeText=
+      doc.querySelector(
+        '.badge'
+      )?.textContent.trim() || '';
+
+    const categoryText=
+      badgeText.replace(
+        /^[^\w]*\s*/,
+        ''
+      );
+
+    const body=
+      doc.querySelector(
+        '.article-body'
+      );
+
+    document.getElementById('title').value=
+      titleText;
+
+    document.getElementById('desc').value=
+      descriptionText;
+
+    document.getElementById('slug').value=
+      slug;
+
+    document.getElementById('slug').dataset.edited=
+      '1';
+
+    document.getElementById('cat').value=
+      categoryText;
+
+    if(body){
+
+      const tip=
+        body.querySelector('.tip');
+
+      const back=
+        body.querySelector('.back');
+
+      if(tip) tip.remove();
+
+      if(back) back.remove();
+
+      document.getElementById(
+        'content'
+      ).innerHTML=
+        body.innerHTML;
+    }
+
+    document.getElementById(
+      'editMode'
+    ).style.display='block';
+
+    document.getElementById(
+      'publishBtn'
+    ).style.display='none';
+
+    document.getElementById(
+      'updateBtn'
+    ).style.display='inline-block';
+
+    document.getElementById(
+      'msg'
+    ).className='msg ok';
+
+    document.getElementById(
+      'msg'
+    ).textContent=
+      '✏️ Article loaded. ఇప్పుడు edit చేయవచ్చు.';
+
+    window.scrollTo({
+      top:0,
+      behavior:'smooth'
+    });
+
+  }catch(e){
+
+    alert('❌ '+e.message);
+
+  }
+}
+
+
+/* =========================
+   IMAGE UPLOAD
+========================= */
+
+async function uploadImage(){
+
+  const file=
+    document.getElementById(
+      'imageFile'
+    ).files[0];
+
+  const imageMsg=
+    document.getElementById(
+      'imageMsg'
+    );
 
   if(!file){
-    imageMsg.textContent='ముందుగా image select చేయండి.';
+
+    imageMsg.textContent=
+      'ముందుగా image select చేయండి.';
+
     return;
   }
 
   if(file.size>2*1024*1024){
-    imageMsg.textContent='Image 2 MB లోపు ఉండాలి.';
+
+    imageMsg.textContent=
+      'Image 2 MB లోపు ఉండాలి.';
+
     return;
   }
 
-  const reader=new FileReader();
+  const reader=
+    new FileReader();
 
   reader.onload=async()=>{
+
     try{
-      imageMsg.textContent='Uploading...';
 
-      const base64=reader.result.split(',')[1];
-      const safeName=Date.now()+'-'+file.name.toLowerCase().replace(/[^a-z0-9._-]/g,'-');
+      imageMsg.textContent=
+        'Uploading...';
 
-      const r=await fetch('/api/upload-image',{
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json',
-          'x-admin-password':pw.value
-        },
-        body:JSON.stringify({
-          fileName:safeName,
-          base64
-        })
-      });
+      const base64=
+        reader.result.split(',')[1];
 
-      const j=await r.json();
+      const safeName=
+        Date.now()+
+        '-'+
+        file.name
+          .toLowerCase()
+          .replace(
+            /[^a-z0-9._-]/g,
+            '-'
+          );
 
-      if(!r.ok) throw new Error(j.error||'Upload failed');
+      const r=
+        await fetch(
+          '/api/upload-image',
+          {
+            method:'POST',
 
-      document.getElementById('content').focus();
-      document.execCommand('insertHTML',false,`<p><img src="${j.url}" alt="${safeName}"></p>`);
+            headers:{
+              'Content-Type':
+                'application/json',
 
-      imageMsg.textContent='✅ Image uploaded and inserted.';
+              'x-admin-password':
+                document.getElementById(
+                  'pw'
+                ).value
+            },
+
+            body:JSON.stringify({
+              fileName:safeName,
+              base64:base64
+            })
+          }
+        );
+
+      const j=
+        await r.json();
+
+      if(!r.ok)
+        throw new Error(
+          j.error || 'Upload failed'
+        );
+
+      document.getElementById(
+        'content'
+      ).focus();
+
+      document.execCommand(
+        'insertHTML',
+        false,
+        `<p>
+          <img
+            src="${j.url}"
+            alt="${safeName}">
+        </p>`
+      );
+
+      imageMsg.textContent=
+        '✅ Image uploaded and inserted.';
+
     }catch(e){
-      imageMsg.textContent='❌ '+e.message;
+
+      imageMsg.textContent=
+        '❌ '+e.message;
+
     }
+
   };
 
   reader.readAsDataURL(file);
 }
-  async function publish(){const msg=document.getElementById('msg');msg.className='msg';msg.textContent='Publishing...';msg.style.display='block';const data={title:title.value,category:cat.value,description:desc.value,slug:slug.value||slugify(title.value),content:content.innerHTML};try{const r=await fetch('/api/publish',{method:'POST',headers:{'Content-Type':'application/json','x-admin-password':pw.value},body:JSON.stringify(data)});const j=await r.json();if(!r.ok)throw new Error(j.error||'Publish failed');msg.className='msg ok';msg.innerHTML='✅ Published successfully! <a href="'+j.url+'" target="_blank">Open article</a>';}catch(e){msg.className='msg err';msg.textContent='❌ '+e.message;}}</script></body></html>
+
+
+/* =========================
+   PUBLISH NEW ARTICLE
+========================= */
+
+async function publish(){
+
+  const msg=
+    document.getElementById('msg');
+
+  msg.className='msg';
+
+  msg.textContent=
+    'Publishing...';
+
+  msg.style.display='block';
+
+  const data={
+
+    title:
+      document.getElementById(
+        'title'
+      ).value,
+
+    category:
+      document.getElementById(
+        'cat'
+      ).value,
+
+    description:
+      document.getElementById(
+        'desc'
+      ).value,
+
+    slug:
+      document.getElementById(
+        'slug'
+      ).value ||
+      slugify(
+        document.getElementById(
+          'title'
+        ).value
+      ),
+
+    content:
+      document.getElementById(
+        'content'
+      ).innerHTML
+  };
+
+  try{
+
+    const r=
+      await fetch(
+        '/api/publish',
+        {
+          method:'POST',
+
+          headers:{
+            'Content-Type':
+              'application/json',
+
+            'x-admin-password':
+              document.getElementById(
+                'pw'
+              ).value
+          },
+
+          body:JSON.stringify(data)
+        }
+      );
+
+    const j=
+      await r.json();
+
+    if(!r.ok)
+      throw new Error(
+        j.error || 'Publish failed'
+      );
+
+    msg.className='msg ok';
+
+    msg.innerHTML=
+      '✅ Published successfully! '+
+      '<a href="'+
+      j.url+
+      '" target="_blank">Open article</a>';
+
+  }catch(e){
+
+    msg.className='msg err';
+
+    msg.textContent=
+      '❌ '+e.message;
+
+  }
+}
+
+
+/* =========================
+   UPDATE ARTICLE
+   =========================
+   
+   NOTE:
+   Backend /api/update-article
+   ఇంకా worker.js లో add చేయలేదు.
+*/
+
+async function updateArticle(){
+
+  const msg=
+    document.getElementById('msg');
+
+  msg.className='msg';
+
+  msg.textContent=
+    'Updating...';
+
+  msg.style.display='block';
+
+  const data={
+
+    title:
+      document.getElementById(
+        'title'
+      ).value,
+
+    category:
+      document.getElementById(
+        'cat'
+      ).value,
+
+    description:
+      document.getElementById(
+        'desc'
+      ).value,
+
+    slug:
+      document.getElementById(
+        'slug'
+      ).value,
+
+    content:
+      document.getElementById(
+        'content'
+      ).innerHTML
+  };
+
+  try{
+
+    const r=
+      await fetch(
+        '/api/update-article',
+        {
+          method:'POST',
+
+          headers:{
+            'Content-Type':
+              'application/json',
+
+            'x-admin-password':
+              document.getElementById(
+                'pw'
+              ).value
+          },
+
+          body:JSON.stringify(data)
+        }
+      );
+
+    const j=
+      await r.json();
+
+    if(!r.ok)
+      throw new Error(
+        j.error || 'Update failed'
+      );
+
+    msg.className='msg ok';
+
+    msg.innerHTML=
+      '✅ Article updated successfully! '+
+      '<a href="'+
+      j.url+
+      '" target="_blank">Open article</a>';
+
+  }catch(e){
+
+    msg.className='msg err';
+
+    msg.textContent=
+      '❌ '+e.message;
+
+  }
+}
+
+
+/* =========================
+   CLEAR FORM
+========================= */
+
+function clearForm(){
+
+  document.getElementById(
+    'title'
+  ).value='';
+
+  document.getElementById(
+    'desc'
+  ).value='';
+
+  document.getElementById(
+    'slug'
+  ).value='';
+
+  document.getElementById(
+    'slug'
+  ).dataset.edited='';
+
+  document.getElementById(
+    'content'
+  ).innerHTML=
+    '<p>ఇక్కడ మీ article రాయండి...</p>';
+
+  document.getElementById(
+    'imageFile'
+  ).value='';
+
+  document.getElementById(
+    'imageMsg'
+  ).textContent='';
+
+  document.getElementById(
+    'editMode'
+  ).style.display='none';
+
+  document.getElementById(
+    'publishBtn'
+  ).style.display='inline-block';
+
+  document.getElementById(
+    'updateBtn'
+  ).style.display='none';
+
+  document.getElementById(
+    'msg'
+  ).className='msg';
+
+  document.getElementById(
+    'msg'
+  ).textContent='';
+}
+
+</script>
+
+</body>
+</html>
+```
