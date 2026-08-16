@@ -1,4 +1,3 @@
-```html
 <!doctype html>
 <html lang="te">
 <head>
@@ -154,12 +153,20 @@ textarea{min-height:100px}
 </p>
 
 <label>Admin Password</label>
-<input id="pw" type="password" placeholder="Cloudflare ADMIN_PASSWORD">
+<input
+  id="pw"
+  type="password"
+  placeholder="Cloudflare ADMIN_PASSWORD"
+>
 
 <label>Article Title</label>
-<input id="title" placeholder="ఉదా: 2026లో Smartphone కొనేటప్పుడు చూడాల్సిన 10 విషయాలు">
+<input
+  id="title"
+  placeholder="ఉదా: 2026లో Smartphone కొనేటప్పుడు చూడాల్సిన 10 విషయాలు"
+>
 
 <label>Category</label>
+
 <select id="cat">
 <option>AI</option>
 <option>Tech</option>
@@ -177,10 +184,18 @@ textarea{min-height:100px}
 </select>
 
 <label>Short Description</label>
-<textarea id="desc" placeholder="Article గురించి 1–2 lines..."></textarea>
+
+<textarea
+  id="desc"
+  placeholder="Article గురించి 1–2 lines..."
+></textarea>
 
 <label>Slug</label>
-<input id="slug" placeholder="smartphone-konetappudu-10-vishayalu">
+
+<input
+  id="slug"
+  placeholder="smartphone-konetappudu-10-vishayalu"
+>
 
 <p class="small">
 English letters/numbers/hyphens మాత్రమే.
@@ -202,77 +217,111 @@ English letters/numbers/hyphens మాత్రమే.
 <button
   type="button"
   class="clear"
-  onclick="uploadImage()">
+  onclick="uploadImage()"
+>
   📷 Upload & Insert Image
 </button>
 
-<p id="imageMsg" class="small"></p>
+<p
+  id="imageMsg"
+  class="small"
+></p>
 
 <label>Article Content</label>
 
 <div class="toolbar">
-  <button type="button" onclick="cmd('bold')">
-    <b>Bold</b>
-  </button>
 
-  <button type="button" onclick="cmd('formatBlock','h2')">
-    H2
-  </button>
+<button
+  type="button"
+  onclick="cmd('bold')"
+>
+  <b>Bold</b>
+</button>
 
-  <button type="button" onclick="cmd('insertUnorderedList')">
-    • List
-  </button>
+<button
+  type="button"
+  onclick="cmd('formatBlock','h2')"
+>
+  H2
+</button>
 
-  <button type="button" onclick="cmd('insertOrderedList')">
-    1. List
-  </button>
+<button
+  type="button"
+  onclick="cmd('insertUnorderedList')"
+>
+  • List
+</button>
+
+<button
+  type="button"
+  onclick="cmd('insertOrderedList')"
+>
+  1. List
+</button>
+
 </div>
 
 <div
   id="content"
   class="editor"
-  contenteditable="true">
+  contenteditable="true"
+>
   <p>ఇక్కడ మీ article రాయండి...</p>
 </div>
 
-<div style="margin-top:30px;border-top:1px solid #e1e8f2;padding-top:20px">
+<div
+  style="
+    margin-top:30px;
+    border-top:1px solid #e1e8f2;
+    padding-top:20px
+  "
+>
 
 <h2>📚 Existing Articles</h2>
 
 <div id="articleList">
-  <button
-    type="button"
-    class="clear"
-    onclick="loadArticles()">
-    📚 Load Existing Articles
-  </button>
+
+<button
+  type="button"
+  class="clear"
+  onclick="loadArticles()"
+>
+  📚 Load Existing Articles
+</button>
+
 </div>
 
 <div class="actions">
 
-  <button
-    id="publishBtn"
-    class="publish"
-    onclick="publish()">
-    🚀 Publish Article
-  </button>
+<button
+  id="publishBtn"
+  class="publish"
+  onclick="publish()"
+>
+  🚀 Publish Article
+</button>
 
-  <button
-    id="updateBtn"
-    class="update"
-    onclick="updateArticle()">
-    ✏️ Update Article
-  </button>
+<button
+  id="updateBtn"
+  class="update"
+  onclick="updateArticle()"
+>
+  ✏️ Update Article
+</button>
 
-  <button
-    class="clear"
-    onclick="clearForm()">
-    Clear
-  </button>
+<button
+  class="clear"
+  onclick="clearForm()"
+>
+  Clear
+</button>
 
 </div>
 
-<div id="msg" class="msg"></div>
+<div
+  id="msg"
+  class="msg"
+></div>
 
 </div>
 
@@ -281,38 +330,96 @@ English letters/numbers/hyphens మాత్రమే.
 
 <script>
 
+/* =========================
+   EDITING SLUG
+========================= */
+
+let editingSlug = '';
+
+
+/* =========================
+   BASIC EDITOR
+========================= */
+
 function cmd(c,v){
-  document.execCommand(c,false,v);
+  document.execCommand(
+    c,
+    false,
+    v
+  );
 }
 
 
+/* =========================
+   SLUG GENERATOR
+========================= */
+
 function slugify(s){
+
   return s
     .toLowerCase()
     .trim()
-    .replace(/[^a-z0-9\s-]/g,'')
-    .replace(/\s+/g,'-')
-    .replace(/-+/g,'-')
-    .replace(/^-|-$/g,'')
-    .slice(0,90);
+    .replace(
+      /[^a-z0-9\s-]/g,
+      ''
+    )
+    .replace(
+      /\s+/g,
+      '-'
+    )
+    .replace(
+      /-+/g,
+      '-'
+    )
+    .replace(
+      /^-|-$/g,
+      ''
+    )
+    .slice(
+      0,
+      90
+    );
 }
 
 
-document.getElementById('title').addEventListener('input',()=>{
-  const s=document.getElementById('slug');
+/* =========================
+   AUTO SLUG
+========================= */
 
-  if(!s.dataset.edited){
-    s.value=slugify(
-      document.getElementById('title').value
-    );
-  }
-});
+document
+  .getElementById('title')
+  .addEventListener(
+    'input',
+    ()=>{
+      
+      const s =
+        document.getElementById(
+          'slug'
+        );
+
+      if(
+        !s.dataset.edited
+      ){
+
+        s.value =
+          slugify(
+            document.getElementById(
+              'title'
+            ).value
+          );
+      }
+    }
+  );
 
 
-document.getElementById('slug').addEventListener(
-  'input',
-  e=>e.target.dataset.edited='1'
-);
+document
+  .getElementById('slug')
+  .addEventListener(
+    'input',
+    e=>{
+      e.target.dataset.edited='1';
+    }
+  );
 
 
 /* =========================
@@ -321,66 +428,89 @@ document.getElementById('slug').addEventListener(
 
 async function loadArticles(){
 
-  const list=document.getElementById('articleList');
+  const list =
+    document.getElementById(
+      'articleList'
+    );
 
-  list.innerHTML='Loading articles...';
+  list.innerHTML =
+    'Loading articles...';
 
   try{
 
-    const r=await fetch('/api/articles',{
-      headers:{
-        'x-admin-password':
-          document.getElementById('pw').value
-      }
-    });
-
-    const j=await r.json();
-
-    if(!r.ok)
-      throw new Error(
-        j.error || 'Failed to load articles'
+    const r =
+      await fetch(
+        '/api/articles',
+        {
+          headers:{
+            'x-admin-password':
+              document.getElementById(
+                'pw'
+              ).value
+          }
+        }
       );
 
-    if(!j.articles || !j.articles.length){
+    const j =
+      await r.json();
 
-      list.innerHTML=
+    if(!r.ok){
+
+      throw new Error(
+        j.error ||
+        'Failed to load articles'
+      );
+    }
+
+    if(
+      !j.articles ||
+      !j.articles.length
+    ){
+
+      list.innerHTML =
         '<p class="small">Articles ఏవీ లేవు.</p>';
 
       return;
     }
 
-    list.innerHTML=j.articles.map(a=>`
+    list.innerHTML =
+      j.articles
+        .map(
+          a=>`
 
-      <div class="article-item">
+<div class="article-item">
 
-        <b>${a.name}</b>
+<b>${a.name}</b>
 
-        <br>
+<br>
 
-        <a
-          href="${a.url}"
-          target="_blank">
-          Open Article
-        </a>
+<a
+  href="${a.url}"
+  target="_blank"
+>
+  Open Article
+</a>
 
-        <button
-          type="button"
-          class="clear"
-          onclick="editArticle('${a.slug}')">
-          ✏️ Edit
-        </button>
+<button
+  type="button"
+  class="clear"
+  onclick="editArticle('${a.slug}')"
+>
+  ✏️ Edit
+</button>
 
-      </div>
+</div>
 
-    `).join('');
+`
+        )
+        .join('');
 
   }catch(e){
 
-    list.innerHTML=
-      '<p style="color:#b91c1c">❌ '
-      +e.message+
+    list.innerHTML =
+      '<p style="color:#b91c1c">❌ '+
+      e.message+
       '</p>';
-
   }
 }
 
@@ -391,112 +521,197 @@ async function loadArticles(){
 
 async function editArticle(slug){
 
+  /* IMPORTANT */
+  editingSlug =
+    slug;
+
   try{
 
-    const r=await fetch(
-      '/api/article?slug='+
-      encodeURIComponent(slug),
-      {
-        headers:{
-          'x-admin-password':
-            document.getElementById('pw').value
+    const r =
+      await fetch(
+        '/api/article?slug='+
+        encodeURIComponent(
+          slug
+        ),
+        {
+          headers:{
+            'x-admin-password':
+              document.getElementById(
+                'pw'
+              ).value
+          }
         }
-      }
-    );
-
-    const j=await r.json();
-
-    if(!r.ok)
-      throw new Error(
-        j.error || 'Failed to load article'
       );
 
-    const parser=new DOMParser();
+    const j =
+      await r.json();
 
-    const doc=
+    if(!r.ok){
+
+      throw new Error(
+        j.error ||
+        'Failed to load article'
+      );
+    }
+
+    const parser =
+      new DOMParser();
+
+    const doc =
       parser.parseFromString(
         j.content,
         'text/html'
       );
 
-    const titleText=
-      doc.querySelector(
-        '.article-hero h1'
-      )?.textContent.trim() || '';
+    const titleText =
+      doc
+        .querySelector(
+          '.article-hero h1'
+        )
+        ?.textContent
+        .trim() ||
+      '';
 
-    const descriptionText=
-      doc.querySelector(
-        '.article-hero p'
-      )?.textContent.trim() || '';
+    const descriptionText =
+      doc
+        .querySelector(
+          '.article-hero p'
+        )
+        ?.textContent
+        .trim() ||
+      '';
 
-    const badgeText=
-      doc.querySelector(
-        '.badge'
-      )?.textContent.trim() || '';
+    const badgeText =
+      doc
+        .querySelector(
+          '.badge'
+        )
+        ?.textContent
+        .trim() ||
+      '';
 
-    const categoryText=
-      badgeText.replace(
-        /^[^\w]*\s*/,
-        ''
+    let categoryText =
+      badgeText
+        .replace(
+          /^[^\p{L}\p{N}]*/u,
+          ''
+        )
+        .trim();
+
+    /*
+      Badge usually looks like:
+      📱 Tech
+      🤖 AI
+      🎓 Education
+    */
+
+    const categories = [
+      'AI',
+      'Tech',
+      'News',
+      'YouTube',
+      'Business',
+      'Education',
+      'Devotional',
+      'Stories',
+      'Tips',
+      'Offers',
+      'Movie Reviews',
+      'Movie News',
+      'AI Stories'
+    ];
+
+    const foundCategory =
+      categories.find(
+        c =>
+          categoryText
+            .includes(c)
       );
 
-    const body=
+    if(foundCategory){
+      categoryText =
+        foundCategory;
+    }
+
+    const body =
       doc.querySelector(
         '.article-body'
       );
 
-    document.getElementById('title').value=
+    document.getElementById(
+      'title'
+    ).value =
       titleText;
 
-    document.getElementById('desc').value=
+    document.getElementById(
+      'desc'
+    ).value =
       descriptionText;
 
-    document.getElementById('slug').value=
+    document.getElementById(
+      'slug'
+    ).value =
       slug;
 
-    document.getElementById('slug').dataset.edited=
+    document.getElementById(
+      'slug'
+    ).dataset.edited =
       '1';
 
-    document.getElementById('cat').value=
+    document.getElementById(
+      'cat'
+    ).value =
       categoryText;
 
     if(body){
 
-      const tip=
-        body.querySelector('.tip');
+      const tip =
+        body.querySelector(
+          '.tip'
+        );
 
-      const back=
-        body.querySelector('.back');
+      const back =
+        body.querySelector(
+          '.back'
+        );
 
-      if(tip) tip.remove();
+      if(tip){
+        tip.remove();
+      }
 
-      if(back) back.remove();
+      if(back){
+        back.remove();
+      }
 
       document.getElementById(
         'content'
-      ).innerHTML=
+      ).innerHTML =
         body.innerHTML;
     }
 
     document.getElementById(
       'editMode'
-    ).style.display='block';
+    ).style.display =
+      'block';
 
     document.getElementById(
       'publishBtn'
-    ).style.display='none';
+    ).style.display =
+      'none';
 
     document.getElementById(
       'updateBtn'
-    ).style.display='inline-block';
+    ).style.display =
+      'inline-block';
 
     document.getElementById(
       'msg'
-    ).className='msg ok';
+    ).className =
+      'msg ok';
 
     document.getElementById(
       'msg'
-    ).textContent=
+    ).textContent =
       '✏️ Article loaded. ఇప్పుడు edit చేయవచ్చు.';
 
     window.scrollTo({
@@ -506,8 +721,13 @@ async function editArticle(slug){
 
   }catch(e){
 
-    alert('❌ '+e.message);
+    editingSlug =
+      '';
 
+    alert(
+      '❌ '+
+      e.message
+    );
   }
 }
 
@@ -518,113 +738,126 @@ async function editArticle(slug){
 
 async function uploadImage(){
 
-  const file=
+  const file =
     document.getElementById(
       'imageFile'
     ).files[0];
 
-  const imageMsg=
+  const imageMsg =
     document.getElementById(
       'imageMsg'
     );
 
   if(!file){
 
-    imageMsg.textContent=
+    imageMsg.textContent =
       'ముందుగా image select చేయండి.';
 
     return;
   }
 
-  if(file.size>2*1024*1024){
+  if(
+    file.size >
+    2 * 1024 * 1024
+  ){
 
-    imageMsg.textContent=
+    imageMsg.textContent =
       'Image 2 MB లోపు ఉండాలి.';
 
     return;
   }
 
-  const reader=
+  const reader =
     new FileReader();
 
-  reader.onload=async()=>{
+  reader.onload =
+    async()=>{
 
-    try{
+      try{
 
-      imageMsg.textContent=
-        'Uploading...';
+        imageMsg.textContent =
+          'Uploading...';
 
-      const base64=
-        reader.result.split(',')[1];
+        const base64 =
+          reader.result
+            .split(',')[1];
 
-      const safeName=
-        Date.now()+
-        '-'+
-        file.name
-          .toLowerCase()
-          .replace(
-            /[^a-z0-9._-]/g,
-            '-'
+        const safeName =
+          Date.now()+
+          '-'+
+          file.name
+            .toLowerCase()
+            .replace(
+              /[^a-z0-9._-]/g,
+              '-'
+            );
+
+        const r =
+          await fetch(
+            '/api/upload-image',
+            {
+              method:'POST',
+
+              headers:{
+                'Content-Type':
+                  'application/json',
+
+                'x-admin-password':
+                  document.getElementById(
+                    'pw'
+                  ).value
+              },
+
+              body:
+                JSON.stringify({
+                  fileName:
+                    safeName,
+                  base64:
+                    base64
+                })
+            }
           );
 
-      const r=
-        await fetch(
-          '/api/upload-image',
-          {
-            method:'POST',
+        const j =
+          await r.json();
 
-            headers:{
-              'Content-Type':
-                'application/json',
+        if(!r.ok){
 
-              'x-admin-password':
-                document.getElementById(
-                  'pw'
-                ).value
-            },
+          throw new Error(
+            j.error ||
+            'Upload failed'
+          );
+        }
 
-            body:JSON.stringify({
-              fileName:safeName,
-              base64:base64
-            })
-          }
+        document.getElementById(
+          'content'
+        ).focus();
+
+        document.execCommand(
+          'insertHTML',
+          false,
+          `<p>
+<img
+  src="${j.url}"
+  alt="${safeName}"
+>
+</p>`
         );
 
-      const j=
-        await r.json();
+        imageMsg.textContent =
+          '✅ Image uploaded and inserted.';
 
-      if(!r.ok)
-        throw new Error(
-          j.error || 'Upload failed'
-        );
+      }catch(e){
 
-      document.getElementById(
-        'content'
-      ).focus();
+        imageMsg.textContent =
+          '❌ '+
+          e.message;
+      }
+    };
 
-      document.execCommand(
-        'insertHTML',
-        false,
-        `<p>
-          <img
-            src="${j.url}"
-            alt="${safeName}">
-        </p>`
-      );
-
-      imageMsg.textContent=
-        '✅ Image uploaded and inserted.';
-
-    }catch(e){
-
-      imageMsg.textContent=
-        '❌ '+e.message;
-
-    }
-
-  };
-
-  reader.readAsDataURL(file);
+  reader.readAsDataURL(
+    file
+  );
 }
 
 
@@ -634,17 +867,21 @@ async function uploadImage(){
 
 async function publish(){
 
-  const msg=
-    document.getElementById('msg');
+  const msg =
+    document.getElementById(
+      'msg'
+    );
 
-  msg.className='msg';
+  msg.className =
+    'msg';
 
-  msg.textContent=
+  msg.textContent =
     'Publishing...';
 
-  msg.style.display='block';
+  msg.style.display =
+    'block';
 
-  const data={
+  const data = {
 
     title:
       document.getElementById(
@@ -679,7 +916,7 @@ async function publish(){
 
   try{
 
-    const r=
+    const r =
       await fetch(
         '/api/publish',
         {
@@ -695,21 +932,28 @@ async function publish(){
               ).value
           },
 
-          body:JSON.stringify(data)
+          body:
+            JSON.stringify(
+              data
+            )
         }
       );
 
-    const j=
+    const j =
       await r.json();
 
-    if(!r.ok)
+    if(!r.ok){
+
       throw new Error(
-        j.error || 'Publish failed'
+        j.error ||
+        'Publish failed'
       );
+    }
 
-    msg.className='msg ok';
+    msg.className =
+      'msg ok';
 
-    msg.innerHTML=
+    msg.innerHTML =
       '✅ Published successfully! '+
       '<a href="'+
       j.url+
@@ -717,37 +961,57 @@ async function publish(){
 
   }catch(e){
 
-    msg.className='msg err';
+    msg.className =
+      'msg err';
 
-    msg.textContent=
-      '❌ '+e.message;
-
+    msg.textContent =
+      '❌ '+
+      e.message;
   }
 }
 
 
 /* =========================
    UPDATE ARTICLE
-   =========================
-   
-   NOTE:
-   Backend /api/update-article
-   ఇంకా worker.js లో add చేయలేదు.
-*/
+========================= */
 
 async function updateArticle(){
 
-  const msg=
-    document.getElementById('msg');
+  const msg =
+    document.getElementById(
+      'msg'
+    );
 
-  msg.className='msg';
+  msg.className =
+    'msg';
 
-  msg.textContent=
+  msg.textContent =
     'Updating...';
 
-  msg.style.display='block';
+  msg.style.display =
+    'block';
 
-  const data={
+  /*
+    IMPORTANT:
+    oldSlug = original article slug
+    slug    = new/current slug
+  */
+
+  if(!editingSlug){
+
+    msg.className =
+      'msg err';
+
+    msg.textContent =
+      '❌ Original article slug missing. Please click Edit again.';
+
+    return;
+  }
+
+  const data = {
+
+    oldSlug:
+      editingSlug,
 
     title:
       document.getElementById(
@@ -767,7 +1031,12 @@ async function updateArticle(){
     slug:
       document.getElementById(
         'slug'
-      ).value,
+      ).value ||
+      slugify(
+        document.getElementById(
+          'title'
+        ).value
+      ),
 
     content:
       document.getElementById(
@@ -777,7 +1046,7 @@ async function updateArticle(){
 
   try{
 
-    const r=
+    const r =
       await fetch(
         '/api/update-article',
         {
@@ -793,21 +1062,36 @@ async function updateArticle(){
               ).value
           },
 
-          body:JSON.stringify(data)
+          body:
+            JSON.stringify(
+              data
+            )
         }
       );
 
-    const j=
+    const j =
       await r.json();
 
-    if(!r.ok)
+    if(!r.ok){
+
       throw new Error(
-        j.error || 'Update failed'
+        j.error ||
+        'Update failed'
       );
+    }
 
-    msg.className='msg ok';
+    /*
+      After successful update,
+      new slug becomes original slug.
+    */
 
-    msg.innerHTML=
+    editingSlug =
+      data.slug;
+
+    msg.className =
+      'msg ok';
+
+    msg.innerHTML =
       '✅ Article updated successfully! '+
       '<a href="'+
       j.url+
@@ -815,11 +1099,12 @@ async function updateArticle(){
 
   }catch(e){
 
-    msg.className='msg err';
+    msg.className =
+      'msg err';
 
-    msg.textContent=
-      '❌ '+e.message;
-
+    msg.textContent =
+      '❌ '+
+      e.message;
   }
 }
 
@@ -830,58 +1115,71 @@ async function updateArticle(){
 
 function clearForm(){
 
+  editingSlug =
+    '';
+
   document.getElementById(
     'title'
-  ).value='';
+  ).value =
+    '';
 
   document.getElementById(
     'desc'
-  ).value='';
+  ).value =
+    '';
 
   document.getElementById(
     'slug'
-  ).value='';
+  ).value =
+    '';
 
   document.getElementById(
     'slug'
-  ).dataset.edited='';
+  ).dataset.edited =
+    '';
 
   document.getElementById(
     'content'
-  ).innerHTML=
+  ).innerHTML =
     '<p>ఇక్కడ మీ article రాయండి...</p>';
 
   document.getElementById(
     'imageFile'
-  ).value='';
+  ).value =
+    '';
 
   document.getElementById(
     'imageMsg'
-  ).textContent='';
+  ).textContent =
+    '';
 
   document.getElementById(
     'editMode'
-  ).style.display='none';
+  ).style.display =
+    'none';
 
   document.getElementById(
     'publishBtn'
-  ).style.display='inline-block';
+  ).style.display =
+    'inline-block';
 
   document.getElementById(
     'updateBtn'
-  ).style.display='none';
+  ).style.display =
+    'none';
 
   document.getElementById(
     'msg'
-  ).className='msg';
+  ).className =
+    'msg';
 
   document.getElementById(
     'msg'
-  ).textContent='';
+  ).textContent =
+    '';
 }
 
 </script>
 
 </body>
 </html>
-```
