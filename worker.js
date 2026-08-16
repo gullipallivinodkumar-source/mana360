@@ -70,7 +70,29 @@ function articleHtml({title,description,category,content,date,slug}) {
 }
 function homeCard({title,category,slug,date}) { const icon=ICONS[category]||"📰"; return `<a class="card" href="articles/${esc(slug)}.html"><div class="card-image">${icon}</div><div class="card-body"><span class="category">${esc(category)}</span><h3>${esc(title)}</h3><div class="date">${esc(date)}</div></div></a>`; }
 function catCard({title,category,slug,description}) { const icon=ICONS[category]||"📰"; return `<a class="cat-card" href="../articles/${esc(slug)}.html"><div class="cat-card-top">${icon}</div><div class="cat-card-body"><small>${esc(category)}</small><h3>${esc(title)}</h3><p>${esc(description)}</p></div></a>`; }
+async function uploadImage(env, fileName, base64Data) {
+  const path = `assets/images/${fileName}`;
+  const existing = await getFile(env, path);
 
+  const repo = env.GITHUB_REPO || "gullipallivinodkumar-source/mana360";
+  const branch = env.GITHUB_BRANCH || "main";
+
+  const body = {
+    message: `Upload image: ${fileName}`,
+    content: base64Data,
+    branch
+  };
+
+  if (existing?.sha) body.sha = existing.sha;
+
+  await gh(env, path, {
+    method: "PUT",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(body)
+  });
+
+  return `/assets/images/${fileName}`;
+}
 async function publish(env, data) {
   const title=(data.title||"").trim(), description=(data.description||"").trim(), category=(data.category||"").trim();
   const content=stripDangerous(data.content||"").trim();
