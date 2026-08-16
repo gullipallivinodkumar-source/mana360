@@ -85,17 +85,23 @@ async function uploadImage(env, fileName, base64Data) {
 
   if (existing?.sha) body.sha = existing.sha;
 
-  await gh(env, path, {
+    await gh(env, path, {
     method: "PUT",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify(body)
   });
 
-  return `/assets/images/${fileName}`;
+  return `https://raw.githubusercontent.com/${repo}/${branch}/assets/images/${fileName}`;
 }
+
 async function publish(env, data) {
   const title=(data.title||"").trim(), description=(data.description||"").trim(), category=(data.category||"").trim();
   const content=stripDangerous(data.content||"").trim();
+  let imageUrl = "";
+
+if (data.image && data.image.name && data.image.data) {
+  imageUrl = await uploadImage(env, data.image.name, data.image.data);
+}
   const slug=safeSlug(data.slug||title);
   if(!title||!description||!category||!content||!slug) throw new Error("Title, description, category, content and slug are required.");
   if(!CATEGORY_FILES[category]) throw new Error("Invalid category.");
@@ -120,6 +126,33 @@ async function publish(env, data) {
 export default {
   async fetch(request, env) {
     const url=new URL(request.url);
+   if(url.pathname==="/api/upload-image" && request.method==="POST"){
+  try{
+    const password=request.headers.get("x-admin-password")||"";
+
+    if(!env.ADMIN_PASSWORD)
+      return new Response(JSON.stringify({error:"ADMIN_PASSWORD is not configured in Cloudflare."}),{status:500,headers:{"content-type":"application/json"}});
+
+    if(password!==env.ADMIN_PASSWORD)
+      return new Response(JSON.stringify({error:"Wrong admin password."}),{status:401,headers:{"content-type":"application/json"}});
+
+    const data=await request.json();
+    const fileName=String(data.fileName||"").toLowerCase().replace(/[^a-z0-9._-]/g,"-").slice(0,100);
+    const base64=String(data.base64||"");
+
+    if(!fileName || !base64)
+      throw new Error("Image file and data are required.");
+
+    if(!/\.(jpg|jpeg|png|webp)$/i.test(fileName))
+      throw new Error("Only JPG, PNG and WebP images are allowed.");
+
+    const imageUrl=await uploadImage(env,fileName,base64);
+
+    return new Response(JSON.stringify({ok:true,url:imageUrl}),{headers:{"content-type":"application/json"}});
+  }catch(e){
+    return new Response(JSON.stringify({error:e.message||String(e)}),{status:400,headers:{"content-type":"application/json"}});
+  }
+}
     if(url.pathname==="/api/publish" && request.method==="POST"){
       try{
         const password=request.headers.get("x-admin-password")||"";
