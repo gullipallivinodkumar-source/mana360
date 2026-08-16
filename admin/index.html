@@ -4,6 +4,62 @@
 <label>Category</label><select id="cat"><option>AI</option><option>Tech</option><option>News</option><option>YouTube</option><option>Business</option><option>Education</option><option>Devotional</option><option>Stories</option><option>Tips</option><option>Offers</option><option>Movie Reviews</option><option>Movie News</option><option>AI Stories</option></select>
 <label>Short Description</label><textarea id="desc" placeholder="Article గురించి 1–2 lines..."></textarea>
 <label>Slug</label><input id="slug" placeholder="smartphone-konetappudu-10-vishayalu"><p class="small">English letters/numbers/hyphens మాత్రమే. ఖాళీగా వదిలితే title నుంచి auto-generate అవుతుంది.</p>
+
+<label>Article Image</label>
+<input id="imageFile" type="file" accept="image/jpeg,image/png,image/webp">
+<button type="button" onclick="uploadImage()">📷 Upload & Insert Image</button>
+<p id="imageMsg" class="small"></p>
+
 <label>Article Content</label><div class="toolbar"><button type="button" onclick="cmd('bold')"><b>Bold</b></button><button type="button" onclick="cmd('formatBlock','h2')">H2</button><button type="button" onclick="cmd('insertUnorderedList')">• List</button><button type="button" onclick="cmd('insertOrderedList')">1. List</button></div><div id="content" class="editor" contenteditable="true"><p>ఇక్కడ మీ article రాయండి...</p></div>
 <div class="actions"><button class="publish" onclick="publish()">🚀 Publish Article</button><button class="clear" onclick="location.reload()">Clear</button></div><div id="msg" class="msg"></div></div></div>
-<script>function cmd(c,v){document.execCommand(c,false,v)}function slugify(s){return s.toLowerCase().trim().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'').slice(0,90)}document.getElementById('title').addEventListener('input',()=>{const s=document.getElementById('slug');if(!s.dataset.edited)s.value=slugify(document.getElementById('title').value)});document.getElementById('slug').addEventListener('input',e=>e.target.dataset.edited='1');async function publish(){const msg=document.getElementById('msg');msg.className='msg';msg.textContent='Publishing...';msg.style.display='block';const data={title:title.value,category:cat.value,description:desc.value,slug:slug.value||slugify(title.value),content:content.innerHTML};try{const r=await fetch('/api/publish',{method:'POST',headers:{'Content-Type':'application/json','x-admin-password':pw.value},body:JSON.stringify(data)});const j=await r.json();if(!r.ok)throw new Error(j.error||'Publish failed');msg.className='msg ok';msg.innerHTML='✅ Published successfully! <a href="'+j.url+'" target="_blank">Open article</a>';}catch(e){msg.className='msg err';msg.textContent='❌ '+e.message;}}</script></body></html>
+<script>function cmd(c,v){document.execCommand(c,false,v)}function slugify(s){return s.toLowerCase().trim().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'').slice(0,90)}document.getElementById('title').addEventListener('input',()=>{const s=document.getElementById('slug');if(!s.dataset.edited)s.value=slugify(document.getElementById('title').value)});document.getElementById('slug').addEventListener('input',e=>e.target.dataset.edited='1');async function uploadImage(){
+  const file=document.getElementById('imageFile').files[0];
+  const imageMsg=document.getElementById('imageMsg');
+
+  if(!file){
+    imageMsg.textContent='ముందుగా image select చేయండి.';
+    return;
+  }
+
+  if(file.size>2*1024*1024){
+    imageMsg.textContent='Image 2 MB లోపు ఉండాలి.';
+    return;
+  }
+
+  const reader=new FileReader();
+
+  reader.onload=async()=>{
+    try{
+      imageMsg.textContent='Uploading...';
+
+      const base64=reader.result.split(',')[1];
+      const safeName=Date.now()+'-'+file.name.toLowerCase().replace(/[^a-z0-9._-]/g,'-');
+
+      const r=await fetch('/api/upload-image',{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'x-admin-password':pw.value
+        },
+        body:JSON.stringify({
+          fileName:safeName,
+          base64
+        })
+      });
+
+      const j=await r.json();
+
+      if(!r.ok) throw new Error(j.error||'Upload failed');
+
+      document.getElementById('content').focus();
+      document.execCommand('insertHTML',false,`<p><img src="${j.url}" alt="${safeName}"></p>`);
+
+      imageMsg.textContent='✅ Image uploaded and inserted.';
+    }catch(e){
+      imageMsg.textContent='❌ '+e.message;
+    }
+  };
+
+  reader.readAsDataURL(file);
+}
+  async function publish(){const msg=document.getElementById('msg');msg.className='msg';msg.textContent='Publishing...';msg.style.display='block';const data={title:title.value,category:cat.value,description:desc.value,slug:slug.value||slugify(title.value),content:content.innerHTML};try{const r=await fetch('/api/publish',{method:'POST',headers:{'Content-Type':'application/json','x-admin-password':pw.value},body:JSON.stringify(data)});const j=await r.json();if(!r.ok)throw new Error(j.error||'Publish failed');msg.className='msg ok';msg.innerHTML='✅ Published successfully! <a href="'+j.url+'" target="_blank">Open article</a>';}catch(e){msg.className='msg err';msg.textContent='❌ '+e.message;}}</script></body></html>
