@@ -129,17 +129,64 @@ function escapeRegExp(text = "") {
 }
 
 /* =====================================================
+   FIRST ARTICLE IMAGE
+===================================================== */
+
+function getFirstImage(html = "") {
+  const match = String(html).match(
+    /<img[^>]+src=["']([^"']+)["'][^>]*>/i
+  );
+
+  if (!match || !match[1]) {
+    return "";
+  }
+
+  return match[1].trim();
+}
+
+/* =====================================================
+   ARTICLE IMAGE NORMALIZATION
+===================================================== */
+
+function normalizeImageUrl(image = "") {
+  image = String(image || "").trim();
+
+  if (!image) {
+    return "";
+  }
+
+  if (
+    image.startsWith("http://") ||
+    image.startsWith("https://") ||
+    image.startsWith("/")
+  ) {
+    return image;
+  }
+
+  if (image.startsWith("../")) {
+    return image;
+  }
+
+  return image;
+}
+
+/* =====================================================
    OLD ARTICLE CATEGORY
 ===================================================== */
 
 function getOldCategory(html = "") {
+
   for (const category of Object.keys(CATEGORY_FILES)) {
-    const icon = ICONS[category] || "📰";
+
+    const icon =
+      ICONS[category] || "📰";
 
     const pattern =
       `<span class="badge">${escapeRegExp(icon)} ${escapeRegExp(category)}</span>`;
 
-    if (new RegExp(pattern, "i").test(html)) {
+    if (
+      new RegExp(pattern, "i").test(html)
+    ) {
       return category;
     }
   }
@@ -152,9 +199,11 @@ function getOldCategory(html = "") {
 ===================================================== */
 
 function getOldDate(html = "") {
-  const match = html.match(
-    /<div class="meta">MANA360 Team\s*·\s*([^<]+)<\/div>/i
-  );
+
+  const match =
+    html.match(
+      /<div class="meta">MANA360 Team\s*·\s*([^<]+)<\/div>/i
+    );
 
   return match && match[1]
     ? match[1].trim()
@@ -162,10 +211,229 @@ function getOldDate(html = "") {
 }
 
 /* =====================================================
+   OLD ARTICLE TITLE
+===================================================== */
+
+function getArticleTitle(html = "") {
+
+  const match =
+    html.match(
+      /<div class="article-hero">[\s\S]*?<h1>([\s\S]*?)<\/h1>/i
+    );
+
+  if (!match) {
+    return "";
+  }
+
+  return String(match[1])
+    .replace(/<[^>]+>/g, "")
+    .trim();
+}
+
+/* =====================================================
+   OLD ARTICLE DESCRIPTION
+===================================================== */
+
+function getArticleDescription(html = "") {
+
+  const match =
+    html.match(
+      /<div class="article-hero">[\s\S]*?<p>([\s\S]*?)<\/p>/i
+    );
+
+  if (!match) {
+    return "";
+  }
+
+  return String(match[1])
+    .replace(/<[^>]+>/g, "")
+    .trim();
+}
+
+/* =====================================================
+   ARTICLE CARD
+===================================================== */
+
+function homeCard({
+  title,
+  category,
+  slug,
+  date,
+  image = ""
+}) {
+
+  const icon =
+    ICONS[category] || "📰";
+
+  const cleanImage =
+    normalizeImageUrl(image);
+
+  const imageHtml =
+    cleanImage
+      ? `
+<div
+  class="card-image"
+  style="
+    width:100%;
+    height:190px;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#eef5ff;
+  "
+>
+  <img
+    src="${esc(cleanImage)}"
+    alt="${esc(title)}"
+    loading="lazy"
+    style="
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    "
+  >
+</div>
+`
+      : `
+<div
+  class="card-image"
+  style="
+    width:100%;
+    height:190px;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#eef5ff;
+    font-size:55px;
+  "
+>
+  ${icon}
+</div>
+`;
+
+  return `<a
+class="card"
+href="articles/${esc(slug)}.html">
+
+${imageHtml}
+
+<div class="card-body">
+
+<span class="category">
+${esc(category)}
+</span>
+
+<h3>
+${esc(title)}
+</h3>
+
+<div class="date">
+${esc(date)}
+</div>
+
+</div>
+
+</a>`;
+}
+
+/* =====================================================
+   CATEGORY CARD
+===================================================== */
+
+function catCard({
+  title,
+  category,
+  slug,
+  description,
+  image = ""
+}) {
+
+  const icon =
+    ICONS[category] || "📰";
+
+  const cleanImage =
+    normalizeImageUrl(image);
+
+  const imageHtml =
+    cleanImage
+      ? `
+<div
+  class="cat-card-top"
+  style="
+    width:100%;
+    height:180px;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#eef5ff;
+  "
+>
+  <img
+    src="${esc(cleanImage)}"
+    alt="${esc(title)}"
+    loading="lazy"
+    style="
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    "
+  >
+</div>
+`
+      : `
+<div
+  class="cat-card-top"
+  style="
+    width:100%;
+    height:180px;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#eef5ff;
+    font-size:50px;
+  "
+>
+  ${icon}
+</div>
+`;
+
+  return `<a
+class="cat-card"
+href="../articles/${esc(slug)}.html">
+
+${imageHtml}
+
+<div class="cat-card-body">
+
+<small>
+${esc(category)}
+</small>
+
+<h3>
+${esc(title)}
+</h3>
+
+<p>
+${esc(description)}
+</p>
+
+</div>
+
+</a>`;
+}
+
+/* =====================================================
    ROBOTS.TXT
 ===================================================== */
 
 function robotsTxt() {
+
   return `# MANA360 robots.txt
 
 User-agent: *
@@ -185,6 +453,7 @@ Sitemap: ${SITE_URL}/sitemap.xml
 ===================================================== */
 
 function sitemapHeader() {
+
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 `;
@@ -195,7 +464,12 @@ function sitemapFooter() {
 }
 
 async function getOrCreateSitemap(env) {
-  const existing = await getFile(env, "sitemap.xml");
+
+  const existing =
+    await getFile(
+      env,
+      "sitemap.xml"
+    );
 
   if (existing) {
     return existing;
@@ -224,8 +498,16 @@ async function getOrCreateSitemap(env) {
   );
 }
 
-function addSitemapEntry(content, url) {
-  if (content.includes(`<loc>${url}</loc>`)) {
+function addSitemapEntry(
+  content,
+  url
+) {
+
+  if (
+    content.includes(
+      `<loc>${url}</loc>`
+    )
+  ) {
     return content;
   }
 
@@ -239,27 +521,43 @@ function addSitemapEntry(content, url) {
 
   return content.replace(
     "</urlset>",
-    entry + "</urlset>"
+    entry +
+    "</urlset>"
   );
 }
 
-function removeSitemapEntry(content, url) {
-  const escaped = escapeRegExp(url);
+function removeSitemapEntry(
+  content,
+  url
+) {
 
-  const regex = new RegExp(
-    `<url>\\s*<loc>${escaped}<\\/loc>[\\s\\S]*?<\\/url>`,
-    "gi"
+  const escaped =
+    escapeRegExp(url);
+
+  const regex =
+    new RegExp(
+      `<url>\\s*<loc>${escaped}<\\/loc>[\\s\\S]*?<\\/url>`,
+      "gi"
+    );
+
+  return content.replace(
+    regex,
+    ""
   );
-
-  return content.replace(regex, "");
 }
 
 /* =====================================================
    GITHUB API
 ===================================================== */
 
-async function gh(env, path, options = {}) {
+async function gh(
+  env,
+  path,
+  options = {}
+) {
+
   if (!env.GITHUB_TOKEN) {
+
     throw new Error(
       "GITHUB_TOKEN is not configured in Cloudflare."
     );
@@ -273,36 +571,56 @@ async function gh(env, path, options = {}) {
     `https://api.github.com/repos/${repo}/contents/${path}`;
 
   const headers = {
-    "Authorization": `Bearer ${env.GITHUB_TOKEN}`,
-    "Accept": "application/vnd.github+json",
-    "X-GitHub-Api-Version": "2022-11-28",
-    "User-Agent": "MANA360-CMS"
+    "Authorization":
+      `Bearer ${env.GITHUB_TOKEN}`,
+
+    "Accept":
+      "application/vnd.github+json",
+
+    "X-GitHub-Api-Version":
+      "2022-11-28",
+
+    "User-Agent":
+      "MANA360-CMS"
   };
 
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      ...headers,
-      ...(options.headers || {})
-    }
-  });
+  const response =
+    await fetch(
+      url,
+      {
+        ...options,
 
-  const text = await response.text();
+        headers: {
+          ...headers,
+          ...(options.headers || {})
+        }
+      }
+    );
+
+  const text =
+    await response.text();
 
   if (!response.ok) {
+
     throw new Error(
       `GitHub ${response.status}: ${text.slice(0, 500)}`
     );
   }
 
-  return text ? JSON.parse(text) : {};
+  return text
+    ? JSON.parse(text)
+    : {};
 }
 
 /* =====================================================
    GET FILE FROM GITHUB
 ===================================================== */
 
-async function getFile(env, path) {
+async function getFile(
+  env,
+  path
+) {
+
   const repo =
     env.GITHUB_REPO ||
     "gullipallivinodkumar-source/mana360";
@@ -315,33 +633,55 @@ async function getFile(env, path) {
     `https://api.github.com/repos/${repo}/contents/${path}?ref=${encodeURIComponent(branch)}`;
 
   const headers = {
-    "Authorization": `Bearer ${env.GITHUB_TOKEN}`,
-    "Accept": "application/vnd.github+json",
-    "X-GitHub-Api-Version": "2022-11-28",
-    "User-Agent": "MANA360-CMS"
+
+    "Authorization":
+      `Bearer ${env.GITHUB_TOKEN}`,
+
+    "Accept":
+      "application/vnd.github+json",
+
+    "X-GitHub-Api-Version":
+      "2022-11-28",
+
+    "User-Agent":
+      "MANA360-CMS"
   };
 
-  const response = await fetch(url, {
-    headers
-  });
+  const response =
+    await fetch(
+      url,
+      {
+        headers
+      }
+    );
 
-  if (response.status === 404) {
+  if (
+    response.status === 404
+  ) {
     return null;
   }
 
-  const text = await response.text();
+  const text =
+    await response.text();
 
   if (!response.ok) {
+
     throw new Error(
       `GitHub ${response.status}: ${text.slice(0, 500)}`
     );
   }
 
-  const json = JSON.parse(text);
+  const json =
+    JSON.parse(text);
 
   return {
-    sha: json.sha,
-    content: b64decode(json.content || "")
+    sha:
+      json.sha,
+
+    content:
+      b64decode(
+        json.content || ""
+      )
   };
 }
 
@@ -356,13 +696,18 @@ async function putFile(
   message,
   sha
 ) {
+
   const branch =
     env.GITHUB_BRANCH ||
     "main";
 
   const body = {
+
     message,
-    content: b64encode(content),
+
+    content:
+      b64encode(content),
+
     branch
   };
 
@@ -370,15 +715,21 @@ async function putFile(
     body.sha = sha;
   }
 
-  return gh(env, path, {
-    method: "PUT",
+  return gh(
+    env,
+    path,
+    {
+      method: "PUT",
 
-    headers: {
-      "Content-Type": "application/json"
-    },
+      headers: {
+        "Content-Type":
+          "application/json"
+      },
 
-    body: JSON.stringify(body)
-  });
+      body:
+        JSON.stringify(body)
+    }
+  );
 }
 
 /* =====================================================
@@ -391,23 +742,30 @@ async function deleteFile(
   sha,
   message
 ) {
+
   const branch =
     env.GITHUB_BRANCH ||
     "main";
 
-  return gh(env, path, {
-    method: "DELETE",
+  return gh(
+    env,
+    path,
+    {
+      method: "DELETE",
 
-    headers: {
-      "Content-Type": "application/json"
-    },
+      headers: {
+        "Content-Type":
+          "application/json"
+      },
 
-    body: JSON.stringify({
-      message,
-      sha,
-      branch
-    })
-  });
+      body:
+        JSON.stringify({
+          message,
+          sha,
+          branch
+        })
+    }
+  );
 }
 
 /* =====================================================
@@ -422,9 +780,23 @@ function articleHtml({
   date,
   slug
 }) {
+
   const icon =
     ICONS[category] ||
     "📰";
+
+  const firstImage =
+    getFirstImage(content);
+
+  const imageMeta =
+    firstImage
+      ? `
+<meta
+  property="og:image"
+  content="${esc(firstImage)}"
+>
+`
+      : "";
 
   return `<!doctype html>
 <html lang="te">
@@ -433,22 +805,36 @@ function articleHtml({
 
 <meta charset="UTF-8">
 
-<meta name="viewport"
-content="width=device-width,initial-scale=1">
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1"
+>
 
-<title>${esc(title)} | MANA360</title>
+<title>
+${esc(title)} | MANA360
+</title>
 
-<meta name="description"
-content="${esc(description)}">
+<meta
+  name="description"
+  content="${esc(description)}"
+>
 
-<meta name="robots"
-content="index, follow">
+<meta
+  name="robots"
+  content="index, follow"
+>
 
-<link rel="canonical"
-href="${SITE_URL}/articles/${esc(slug)}.html">
+<link
+  rel="canonical"
+  href="${SITE_URL}/articles/${esc(slug)}.html"
+>
 
-<link rel="stylesheet"
-href="../assets/style.css">
+${imageMeta}
+
+<link
+  rel="stylesheet"
+  href="../assets/style.css"
+>
 
 <style>
 
@@ -692,10 +1078,12 @@ href="../assets/style.css">
 <body>
 
 <main
-class="container article-wrap">
+class="container article-wrap"
+>
 
 <section
-class="article-hero">
+class="article-hero"
+>
 
 <span class="badge">
 ${icon} ${esc(category)}
@@ -718,7 +1106,8 @@ MANA360 Team · ${esc(date)}
 <div class="article-layout">
 
 <article
-class="article-body">
+class="article-body"
+>
 
 ${stripDangerous(content)}
 
@@ -740,7 +1129,8 @@ class="back"
 href="../categories/${esc(
   CATEGORY_FILES[category] ||
   "news.html"
-)}">
+)}"
+>
 
 ← ${esc(category)}
 Categoryకి తిరిగి వెళ్లండి
@@ -750,7 +1140,8 @@ Categoryకి తిరిగి వెళ్లండి
 </article>
 
 <aside
-class="article-side">
+class="article-side"
+>
 
 <h3>
 📚 Related Topics
@@ -788,85 +1179,497 @@ class="article-side">
 }
 
 /* =====================================================
-   HOME CARD
+   SEARCH INDEX
 ===================================================== */
 
-function homeCard({
-  title,
-  category,
-  slug,
-  date
-}) {
-  const icon =
-    ICONS[category] ||
-    "📰";
+function updateSearchArray(
+  array,
+  article
+) {
 
-  return `<a
-class="card"
-href="articles/${esc(slug)}.html">
+  const filtered =
+    array.filter(
+      item =>
+        item.slug !== article.slug
+    );
 
-<div class="card-image">
-${icon}
-</div>
+  filtered.unshift({
+    title:
+      article.title,
 
-<div class="card-body">
+    cat:
+      article.category,
 
-<span class="category">
-${esc(category)}
-</span>
+    icon:
+      ICONS[article.category] ||
+      "📰",
 
-<h3>
-${esc(title)}
-</h3>
+    slug:
+      article.slug
+  });
 
-<div class="date">
-${esc(date)}
-</div>
-
-</div>
-
-</a>`;
+  return filtered.slice(
+    0,
+    100
+  );
 }
 
 /* =====================================================
-   CATEGORY CARD
+   UPDATE SEARCH
 ===================================================== */
 
-function catCard({
-  title,
+async function updateSearch(
+  env,
+  article,
+  oldSlug = ""
+) {
+
+  const search =
+    await getFile(
+      env,
+      "search.html"
+    );
+
+  if (!search) {
+    return;
+  }
+
+  const match =
+    search.content.match(
+      /const data=(\[.*?\]);/s
+    );
+
+  if (!match) {
+    return;
+  }
+
+  try {
+
+    const array =
+      JSON.parse(match[1]);
+
+    const filtered =
+      array.filter(
+        item =>
+          item.slug !== oldSlug &&
+          item.slug !== article.slug
+      );
+
+    filtered.unshift({
+      title:
+        article.title,
+
+      cat:
+        article.category,
+
+      icon:
+        ICONS[article.category] ||
+        "📰",
+
+      slug:
+        article.slug
+    });
+
+    const updated =
+      search.content.replace(
+        match[0],
+        `const data=${JSON.stringify(
+          filtered.slice(0, 100)
+        )};`
+      );
+
+    if (
+      updated !==
+      search.content
+    ) {
+
+      await putFile(
+        env,
+        "search.html",
+        updated,
+        `Update ${article.title} in search index`,
+        search.sha
+      );
+    }
+
+  } catch(error) {
+
+    console.log(
+      "Search update skipped:",
+      error
+    );
+  }
+}
+
+/* =====================================================
+   REMOVE ARTICLE CARD FROM PAGE
+===================================================== */
+
+function removeHomeCard(
+  html,
+  slug
+) {
+
+  const escaped =
+    escapeRegExp(slug);
+
+  const regex =
+    new RegExp(
+      `<a[^>]*class=["']card["'][^>]*href=["']articles/${escaped}\\.html["'][\\s\\S]*?<\\/a>`,
+      "gi"
+    );
+
+  return html.replace(
+    regex,
+    ""
+  );
+}
+
+function removeCategoryCard(
+  html,
+  slug
+) {
+
+  const escaped =
+    escapeRegExp(slug);
+
+  const regex =
+    new RegExp(
+      `<a[^>]*class=["']cat-card["'][^>]*href=["']\\.\\./articles/${escaped}\\.html["'][\\s\\S]*?<\\/a>`,
+      "gi"
+    );
+
+  return html.replace(
+    regex,
+    ""
+  );
+}
+
+/* =====================================================
+   ADD HOME CARD
+===================================================== */
+
+async function addHomeCard(
+  env,
+  article
+) {
+
+  const index =
+    await getFile(
+      env,
+      "index.html"
+    );
+
+  if (!index) {
+    return;
+  }
+
+  const marker =
+    '<div class="grid">';
+
+  let updated =
+    removeHomeCard(
+      index.content,
+      article.slug
+    );
+
+  const card =
+    homeCard(article);
+
+  if (
+    updated.includes(marker)
+  ) {
+
+    updated =
+      updated.replace(
+        marker,
+        marker + card
+      );
+  }
+
+  if (
+    updated !==
+    index.content
+  ) {
+
+    await putFile(
+      env,
+      "index.html",
+      updated,
+      `Update ${article.title} on homepage`,
+      index.sha
+    );
+  }
+}
+
+/* =====================================================
+   ADD CATEGORY CARD
+===================================================== */
+
+async function addCategoryCard(
+  env,
+  article
+) {
+
+  const categoryPath =
+    `categories/${CATEGORY_FILES[article.category]}`;
+
+  const categoryFile =
+    await getFile(
+      env,
+      categoryPath
+    );
+
+  if (!categoryFile) {
+    return;
+  }
+
+  const marker =
+    '<section class="cat-grid">';
+
+  let updated =
+    removeCategoryCard(
+      categoryFile.content,
+      article.slug
+    );
+
+  const card =
+    catCard(article);
+
+  if (
+    updated.includes(marker)
+  ) {
+
+    updated =
+      updated.replace(
+        marker,
+        marker + card
+      );
+  }
+
+  if (
+    updated !==
+    categoryFile.content
+  ) {
+
+    await putFile(
+      env,
+      categoryPath,
+      updated,
+      `Update ${article.title} in ${article.category} category`,
+      categoryFile.sha
+    );
+  }
+}
+
+/* =====================================================
+   REMOVE OLD CATEGORY CARD
+===================================================== */
+
+async function removeFromCategory(
+  env,
   category,
-  slug,
-  description
-}) {
-  const icon =
-    ICONS[category] ||
-    "📰";
+  slug
+) {
 
-  return `<a
-class="cat-card"
-href="../articles/${esc(slug)}.html">
+  if (
+    !category ||
+    !CATEGORY_FILES[category]
+  ) {
+    return;
+  }
 
-<div class="cat-card-top">
-${icon}
-</div>
+  const path =
+    `categories/${CATEGORY_FILES[category]}`;
 
-<div class="cat-card-body">
+  const file =
+    await getFile(
+      env,
+      path
+    );
 
-<small>
-${esc(category)}
-</small>
+  if (!file) {
+    return;
+  }
 
-<h3>
-${esc(title)}
-</h3>
+  const updated =
+    removeCategoryCard(
+      file.content,
+      slug
+    );
 
-<p>
-${esc(description)}
-</p>
+  if (
+    updated !==
+    file.content
+  ) {
 
-</div>
+    await putFile(
+      env,
+      path,
+      updated,
+      `Remove ${slug} from ${category}`,
+      file.sha
+    );
+  }
+}
 
-</a>`;
+/* =====================================================
+   BUILD ARTICLE INFORMATION
+===================================================== */
+
+async function getArticleInfo(
+  env,
+  fileName
+) {
+
+  const slug =
+    fileName.replace(
+      /\.html$/i,
+      ""
+    );
+
+  const file =
+    await getFile(
+      env,
+      `articles/${fileName}`
+    );
+
+  if (!file) {
+    return null;
+  }
+
+  const category =
+    getOldCategory(
+      file.content
+    );
+
+  const title =
+    getArticleTitle(
+      file.content
+    );
+
+  const description =
+    getArticleDescription(
+      file.content
+    );
+
+  const date =
+    getOldDate(
+      file.content
+    );
+
+  const image =
+    getFirstImage(
+      file.content
+    );
+
+  return {
+    title,
+    description,
+    category:
+      category ||
+      "News",
+    slug,
+    date,
+    image
+  };
+}
+
+/* =====================================================
+   SYNC ALL EXISTING ARTICLES
+===================================================== */
+
+async function syncAllArticleCards(
+  env
+) {
+
+  const files =
+    await gh(
+      env,
+      "articles",
+      {
+        method: "GET"
+      }
+    );
+
+  if (
+    !Array.isArray(files)
+  ) {
+    return [];
+  }
+
+  const articleFiles =
+    files.filter(
+      file =>
+        file.type === "file" &&
+        file.name.endsWith(".html")
+    );
+
+  const articles = [];
+
+  for (
+    const file of articleFiles
+  ) {
+
+    try {
+
+      const article =
+        await getArticleInfo(
+          env,
+          file.name
+        );
+
+      if (
+        article &&
+        article.title
+      ) {
+        articles.push(
+          article
+        );
+      }
+
+    } catch(error) {
+
+      console.log(
+        "Article sync skipped:",
+        file.name,
+        error
+      );
+    }
+  }
+
+  /*
+    Rebuild each article card
+    using its actual first image.
+  */
+
+  for (
+    const article of articles
+  ) {
+
+    try {
+
+      await addHomeCard(
+        env,
+        article
+      );
+
+      await addCategoryCard(
+        env,
+        article
+      );
+
+    } catch(error) {
+
+      console.log(
+        "Card sync failed:",
+        article.slug,
+        error
+      );
+    }
+  }
+
+  return articles;
 }
 
 /* =====================================================
@@ -878,11 +1681,15 @@ async function uploadImage(
   fileName,
   base64Data
 ) {
+
   const path =
     `assets/images/${fileName}`;
 
   const existing =
-    await getFile(env, path);
+    await getFile(
+      env,
+      path
+    );
 
   const repo =
     env.GITHUB_REPO ||
@@ -893,6 +1700,7 @@ async function uploadImage(
     "main";
 
   const body = {
+
     message:
       `Upload image: ${fileName}`,
 
@@ -902,22 +1710,28 @@ async function uploadImage(
     branch
   };
 
-  if (existing?.sha) {
+  if (
+    existing?.sha
+  ) {
     body.sha =
       existing.sha;
   }
 
-  await gh(env, path, {
-    method: "PUT",
+  await gh(
+    env,
+    path,
+    {
+      method: "PUT",
 
-    headers: {
-      "Content-Type":
-        "application/json"
-    },
+      headers: {
+        "Content-Type":
+          "application/json"
+      },
 
-    body:
-      JSON.stringify(body)
-  });
+      body:
+        JSON.stringify(body)
+    }
+  );
 
   return `https://raw.githubusercontent.com/${repo}/${branch}/assets/images/${fileName}`;
 }
@@ -926,20 +1740,31 @@ async function uploadImage(
    PUBLISH ARTICLE
 ===================================================== */
 
-async function publish(env, data) {
+async function publish(
+  env,
+  data
+) {
 
   const title =
-    String(data.title || "").trim();
+    String(
+      data.title || ""
+    ).trim();
 
   const description =
-    String(data.description || "").trim();
+    String(
+      data.description || ""
+    ).trim();
 
   const category =
-    String(data.category || "").trim();
+    String(
+      data.category || ""
+    ).trim();
 
   const content =
     stripDangerous(
-      String(data.content || "")
+      String(
+        data.content || ""
+      )
     ).trim();
 
   if (
@@ -948,12 +1773,16 @@ async function publish(env, data) {
     !category ||
     !content
   ) {
+
     throw new Error(
       "Title, description, category and content are required."
     );
   }
 
-  if (!CATEGORY_FILES[category]) {
+  if (
+    !CATEGORY_FILES[category]
+  ) {
+
     throw new Error(
       "Invalid category."
     );
@@ -961,10 +1790,12 @@ async function publish(env, data) {
 
   const slug =
     safeSlug(
-      data.slug || title
+      data.slug ||
+      title
     );
 
   if (!slug) {
+
     throw new Error(
       "Valid slug is required."
     );
@@ -975,6 +1806,7 @@ async function publish(env, data) {
     data.image.name &&
     data.image.data
   ) {
+
     await uploadImage(
       env,
       data.image.name,
@@ -984,6 +1816,11 @@ async function publish(env, data) {
 
   const date =
     nowIndia();
+
+  const image =
+    getFirstImage(
+      content
+    );
 
   const articlePath =
     `articles/${slug}.html`;
@@ -995,6 +1832,7 @@ async function publish(env, data) {
     );
 
   if (existing) {
+
     throw new Error(
       "This slug already exists. Use a different slug."
     );
@@ -1018,157 +1856,47 @@ async function publish(env, data) {
 
   /* HOME */
 
-  const index =
-    await getFile(
-      env,
-      "index.html"
-    );
-
-  if (index) {
-
-    const marker =
-      '<div class="grid">';
-
-    const card =
-      homeCard({
-        title,
-        category,
-        slug,
-        date
-      });
-
-    const updated =
-      index.content.includes(marker)
-        ? index.content.replace(
-            marker,
-            marker + card
-          )
-        : index.content;
-
-    if (updated !== index.content) {
-
-      await putFile(
-        env,
-        "index.html",
-        updated,
-        `Add ${title} to homepage`,
-        index.sha
-      );
-
+  await addHomeCard(
+    env,
+    {
+      title,
+      category,
+      slug,
+      date,
+      image
     }
-  }
+  );
 
   /* CATEGORY */
 
-  const categoryPath =
-    `categories/${CATEGORY_FILES[category]}`;
-
-  const categoryFile =
-    await getFile(
-      env,
-      categoryPath
-    );
-
-  if (categoryFile) {
-
-    const marker =
-      '<section class="cat-grid">';
-
-    const card =
-      catCard({
-        title,
-        category,
-        slug,
-        description
-      });
-
-    const updated =
-      categoryFile.content.includes(marker)
-        ? categoryFile.content.replace(
-            marker,
-            marker + card
-          )
-        : categoryFile.content;
-
-    if (updated !== categoryFile.content) {
-
-      await putFile(
-        env,
-        categoryPath,
-        updated,
-        `Add ${title} to ${category} category`,
-        categoryFile.sha
-      );
-
+  await addCategoryCard(
+    env,
+    {
+      title,
+      category,
+      slug,
+      description,
+      image
     }
-  }
+  );
 
   /* SEARCH */
 
-  const search =
-    await getFile(
-      env,
-      "search.html"
-    );
-
-  if (search) {
-
-    const match =
-      search.content.match(
-        /const data=(\[.*?\]);/s
-      );
-
-    if (match) {
-
-      try {
-
-        const array =
-          JSON.parse(match[1]);
-
-        array.unshift({
-          title,
-          cat: category,
-          icon:
-            ICONS[category] ||
-            "📰",
-          slug
-        });
-
-        const updated =
-          search.content.replace(
-            match[0],
-            `const data=${JSON.stringify(
-              array.slice(0, 100)
-            )};`
-          );
-
-        if (updated !== search.content) {
-
-          await putFile(
-            env,
-            "search.html",
-            updated,
-            `Add ${title} to search index`,
-            search.sha
-          );
-
-        }
-
-      } catch (error) {
-
-        console.log(
-          "Search update skipped:",
-          error
-        );
-
-      }
+  await updateSearch(
+    env,
+    {
+      title,
+      category,
+      slug
     }
-  }
+  );
 
   /* SITEMAP */
 
   const sitemap =
-    await getOrCreateSitemap(env);
+    await getOrCreateSitemap(
+      env
+    );
 
   if (sitemap) {
 
@@ -1181,7 +1909,10 @@ async function publish(env, data) {
         articleUrl
       );
 
-    if (updated !== sitemap.content) {
+    if (
+      updated !==
+      sitemap.content
+    ) {
 
       await putFile(
         env,
@@ -1190,13 +1921,15 @@ async function publish(env, data) {
         `Add ${title} to sitemap`,
         sitemap.sha
       );
-
     }
   }
 
   return {
+
     ok: true,
+
     slug,
+
     url:
       `${SITE_URL}/articles/${slug}.html`
   };
@@ -1217,22 +1950,31 @@ async function updateArticle(
     );
 
   const title =
-    String(data.title || "").trim();
+    String(
+      data.title || ""
+    ).trim();
 
   const description =
-    String(data.description || "").trim();
+    String(
+      data.description || ""
+    ).trim();
 
   const category =
-    String(data.category || "").trim();
+    String(
+      data.category || ""
+    ).trim();
 
   const content =
     stripDangerous(
-      String(data.content || "")
+      String(
+        data.content || ""
+      )
     ).trim();
 
   const newSlug =
     safeSlug(
-      data.slug || title
+      data.slug ||
+      title
     );
 
   if (
@@ -1243,12 +1985,16 @@ async function updateArticle(
     !content ||
     !newSlug
   ) {
+
     throw new Error(
       "Old slug, title, description, category, content and slug are required."
     );
   }
 
-  if (!CATEGORY_FILES[category]) {
+  if (
+    !CATEGORY_FILES[category]
+  ) {
+
     throw new Error(
       "Invalid category."
     );
@@ -1264,6 +2010,7 @@ async function updateArticle(
     );
 
   if (!oldFile) {
+
     throw new Error(
       "Original article not found."
     );
@@ -1279,7 +2026,15 @@ async function updateArticle(
       oldFile.content
     );
 
-  if (newSlug !== oldSlug) {
+  const image =
+    getFirstImage(
+      content
+    );
+
+  if (
+    newSlug !==
+    oldSlug
+  ) {
 
     const newExisting =
       await getFile(
@@ -1288,6 +2043,7 @@ async function updateArticle(
       );
 
     if (newExisting) {
+
       throw new Error(
         "New slug already exists. Please use a different slug."
       );
@@ -1301,13 +2057,17 @@ async function updateArticle(
       category,
       content,
       date,
-      slug: newSlug
+      slug:
+        newSlug
     });
 
   const newPath =
     `articles/${newSlug}.html`;
 
-  if (newSlug === oldSlug) {
+  if (
+    newSlug ===
+    oldSlug
+  ) {
 
     await putFile(
       env,
@@ -1325,7 +2085,6 @@ async function updateArticle(
       newHtml,
       `Update article: ${title}`
     );
-
   }
 
   /* HOME */
@@ -1338,20 +2097,23 @@ async function updateArticle(
 
   if (index) {
 
-    const escaped =
-      escapeRegExp(oldSlug);
-
-    const oldCardRegex =
-      new RegExp(
-        `<a[^>]*class=["']card["'][^>]*href=["']articles/${escaped}\\.html["'][\\s\\S]*?<\\/a>`,
-        "i"
-      );
-
     let updated =
-      index.content.replace(
-        oldCardRegex,
-        ""
+      removeHomeCard(
+        index.content,
+        oldSlug
       );
+
+    if (
+      newSlug !==
+      oldSlug
+    ) {
+
+      updated =
+        removeHomeCard(
+          updated,
+          newSlug
+        );
+    }
 
     const marker =
       '<div class="grid">';
@@ -1360,21 +2122,28 @@ async function updateArticle(
       homeCard({
         title,
         category,
-        slug: newSlug,
-        date
+        slug:
+          newSlug,
+        date,
+        image
       });
 
-    if (updated.includes(marker)) {
+    if (
+      updated.includes(marker)
+    ) {
 
       updated =
         updated.replace(
           marker,
-          marker + newCard
+          marker +
+          newCard
         );
-
     }
 
-    if (updated !== index.content) {
+    if (
+      updated !==
+      index.content
+    ) {
 
       await putFile(
         env,
@@ -1383,201 +2152,62 @@ async function updateArticle(
         `Update ${title} on homepage`,
         index.sha
       );
-
     }
   }
 
   /* OLD CATEGORY */
 
+  await removeFromCategory(
+    env,
+    oldCategory,
+    oldSlug
+  );
+
   if (
-    oldCategory &&
-    CATEGORY_FILES[oldCategory]
+    newSlug !==
+    oldSlug
   ) {
 
-    const oldCategoryPath =
-      `categories/${CATEGORY_FILES[oldCategory]}`;
-
-    const oldCategoryFile =
-      await getFile(
-        env,
-        oldCategoryPath
-      );
-
-    if (oldCategoryFile) {
-
-      const escaped =
-        escapeRegExp(oldSlug);
-
-      const oldCategoryRegex =
-        new RegExp(
-          `<a[^>]*class=["']cat-card["'][^>]*href=["']\\.\\./articles/${escaped}\\.html["'][\\s\\S]*?<\\/a>`,
-          "i"
-        );
-
-      const updated =
-        oldCategoryFile.content.replace(
-          oldCategoryRegex,
-          ""
-        );
-
-      if (
-        updated !==
-        oldCategoryFile.content
-      ) {
-
-        await putFile(
-          env,
-          oldCategoryPath,
-          updated,
-          `Remove old article from ${oldCategory}`,
-          oldCategoryFile.sha
-        );
-
-      }
-    }
+    await removeFromCategory(
+      env,
+      category,
+      newSlug
+    );
   }
 
   /* NEW CATEGORY */
 
-  const newCategoryPath =
-    `categories/${CATEGORY_FILES[category]}`;
-
-  const newCategoryFile =
-    await getFile(
-      env,
-      newCategoryPath
-    );
-
-  if (newCategoryFile) {
-
-    const escaped =
-      escapeRegExp(newSlug);
-
-    const existingRegex =
-      new RegExp(
-        `<a[^>]*class=["']cat-card["'][^>]*href=["']\\.\\./articles/${escaped}\\.html["'][\\s\\S]*?<\\/a>`,
-        "i"
-      );
-
-    let updated =
-      newCategoryFile.content.replace(
-        existingRegex,
-        ""
-      );
-
-    const marker =
-      '<section class="cat-grid">';
-
-    const newCard =
-      catCard({
-        title,
-        category,
-        slug: newSlug,
-        description
-      });
-
-    if (updated.includes(marker)) {
-
-      updated =
-        updated.replace(
-          marker,
-          marker + newCard
-        );
-
+  await addCategoryCard(
+    env,
+    {
+      title,
+      category,
+      slug:
+        newSlug,
+      description,
+      image
     }
-
-    if (
-      updated !==
-      newCategoryFile.content
-    ) {
-
-      await putFile(
-        env,
-        newCategoryPath,
-        updated,
-        `Update ${title} in ${category} category`,
-        newCategoryFile.sha
-      );
-
-    }
-  }
+  );
 
   /* SEARCH */
 
-  const search =
-    await getFile(
-      env,
-      "search.html"
-    );
-
-  if (search) {
-
-    const match =
-      search.content.match(
-        /const data=(\[.*?\]);/s
-      );
-
-    if (match) {
-
-      try {
-
-        const array =
-          JSON.parse(match[1]);
-
-        const filtered =
-          array.filter(
-            item =>
-              item.slug !== oldSlug &&
-              item.slug !== newSlug
-          );
-
-        filtered.unshift({
-          title,
-          cat: category,
-          icon:
-            ICONS[category] ||
-            "📰",
-          slug: newSlug
-        });
-
-        const updated =
-          search.content.replace(
-            match[0],
-            `const data=${JSON.stringify(
-              filtered.slice(0, 100)
-            )};`
-          );
-
-        if (
-          updated !==
-          search.content
-        ) {
-
-          await putFile(
-            env,
-            "search.html",
-            updated,
-            `Update ${title} in search index`,
-            search.sha
-          );
-
-        }
-
-      } catch (error) {
-
-        console.log(
-          "Search update skipped:",
-          error
-        );
-
-      }
-    }
-  }
+  await updateSearch(
+    env,
+    {
+      title,
+      category,
+      slug:
+        newSlug
+    },
+    oldSlug
+  );
 
   /* SITEMAP */
 
   const sitemap =
-    await getOrCreateSitemap(env);
+    await getOrCreateSitemap(
+      env
+    );
 
   if (sitemap) {
 
@@ -1611,13 +2241,15 @@ async function updateArticle(
         `Update ${title} in sitemap`,
         sitemap.sha
       );
-
     }
   }
 
   /* DELETE OLD SLUG */
 
-  if (newSlug !== oldSlug) {
+  if (
+    newSlug !==
+    oldSlug
+  ) {
 
     await deleteFile(
       env,
@@ -1625,10 +2257,10 @@ async function updateArticle(
       oldFile.sha,
       `Remove old article: ${oldSlug}`
     );
-
   }
 
   return {
+
     ok: true,
 
     slug:
@@ -1647,12 +2279,14 @@ function jsonResponse(
   data,
   status = 200
 ) {
+
   return new Response(
     JSON.stringify(data),
     {
       status,
 
       headers: {
+
         "content-type":
           "application/json; charset=UTF-8",
 
@@ -1672,9 +2306,12 @@ function checkAdmin(
   env
 ) {
 
-  if (!env.ADMIN_PASSWORD) {
+  if (
+    !env.ADMIN_PASSWORD
+  ) {
 
     return {
+
       ok: false,
 
       status: 500,
@@ -1682,7 +2319,6 @@ function checkAdmin(
       error:
         "ADMIN_PASSWORD is not configured in Cloudflare."
     };
-
   }
 
   const password =
@@ -1696,6 +2332,7 @@ function checkAdmin(
   ) {
 
     return {
+
       ok: false,
 
       status: 401,
@@ -1703,7 +2340,6 @@ function checkAdmin(
       error:
         "Wrong admin password."
     };
-
   }
 
   return {
@@ -1728,24 +2364,6 @@ export default {
         request.url
       );
 
-    /*
-    =====================================================
-    IMPORTANT:
-    NO DOMAIN REDIRECT HERE.
-
-    Cloudflare handles the canonical domain.
-    This prevents:
-
-    mana360.in
-        ↓
-    www.mana360.in
-        ↓
-    mana360.in
-        ↓
-    LOOP
-    =====================================================
-    */
-
     /* ===================================================
        ROBOTS.TXT
     =================================================== */
@@ -1763,6 +2381,7 @@ export default {
           status: 200,
 
           headers: {
+
             "content-type":
               "text/plain; charset=UTF-8",
 
@@ -1771,7 +2390,6 @@ export default {
           }
         }
       );
-
     }
 
     /* ===================================================
@@ -1811,6 +2429,7 @@ export default {
               status: 200,
 
               headers: {
+
                 "content-type":
                   "application/xml; charset=UTF-8",
 
@@ -1819,7 +2438,6 @@ export default {
               }
             }
           );
-
         }
 
         return new Response(
@@ -1828,6 +2446,7 @@ export default {
             status: 200,
 
             headers: {
+
               "content-type":
                 "application/xml; charset=UTF-8",
 
@@ -1837,7 +2456,7 @@ export default {
           }
         );
 
-      } catch (error) {
+      } catch(error) {
 
         return new Response(
           sitemapHeader() +
@@ -1852,17 +2471,18 @@ export default {
             status: 200,
 
             headers: {
+
               "content-type":
                 "application/xml; charset=UTF-8"
             }
           }
         );
-
       }
     }
 
     /* ===================================================
        GET ARTICLES
+       ALSO SYNCS EXISTING ARTICLE IMAGES
     =================================================== */
 
     if (
@@ -1889,8 +2509,19 @@ export default {
             },
             auth.status
           );
-
         }
+
+        /*
+          IMPORTANT:
+          Existing articles are scanned here.
+          Their first images are automatically
+          added to Home + Category cards.
+        */
+
+        const synced =
+          await syncAllArticleCards(
+            env
+          );
 
         const files =
           await gh(
@@ -1929,11 +2560,16 @@ export default {
             );
 
         return jsonResponse({
+
           ok: true,
-          articles
+
+          articles,
+
+          synced:
+            synced.length
         });
 
-      } catch (error) {
+      } catch(error) {
 
         return jsonResponse(
           {
@@ -1943,7 +2579,6 @@ export default {
           },
           400
         );
-
       }
     }
 
@@ -1975,7 +2610,6 @@ export default {
             },
             auth.status
           );
-
         }
 
         const slug =
@@ -1992,7 +2626,6 @@ export default {
             },
             400
           );
-
         }
 
         const cleanSlug =
@@ -2013,17 +2646,17 @@ export default {
             },
             404
           );
-
         }
 
         return jsonResponse({
+
           ok: true,
 
           content:
             file.content
         });
 
-      } catch (error) {
+      } catch(error) {
 
         return jsonResponse(
           {
@@ -2033,7 +2666,6 @@ export default {
           },
           400
         );
-
       }
     }
 
@@ -2065,7 +2697,6 @@ export default {
             },
             auth.status
           );
-
         }
 
         const data =
@@ -2080,7 +2711,10 @@ export default {
               /[^a-z0-9._-]/g,
               "-"
             )
-            .slice(0, 100);
+            .slice(
+              0,
+              100
+            );
 
         const base64 =
           String(
@@ -2095,7 +2729,6 @@ export default {
           throw new Error(
             "Image file and data are required."
           );
-
         }
 
         if (
@@ -2107,7 +2740,6 @@ export default {
           throw new Error(
             "Only JPG, PNG and WebP images are allowed."
           );
-
         }
 
         const imageUrl =
@@ -2118,11 +2750,14 @@ export default {
           );
 
         return jsonResponse({
+
           ok: true,
-          url: imageUrl
+
+          url:
+            imageUrl
         });
 
-      } catch (error) {
+      } catch(error) {
 
         return jsonResponse(
           {
@@ -2132,7 +2767,6 @@ export default {
           },
           400
         );
-
       }
     }
 
@@ -2164,7 +2798,6 @@ export default {
             },
             auth.status
           );
-
         }
 
         const data =
@@ -2180,7 +2813,7 @@ export default {
           result
         );
 
-      } catch (error) {
+      } catch(error) {
 
         return jsonResponse(
           {
@@ -2190,7 +2823,6 @@ export default {
           },
           400
         );
-
       }
     }
 
@@ -2222,7 +2854,6 @@ export default {
             },
             auth.status
           );
-
         }
 
         const data =
@@ -2238,7 +2869,7 @@ export default {
           result
         );
 
-      } catch (error) {
+      } catch(error) {
 
         return jsonResponse(
           {
@@ -2248,7 +2879,6 @@ export default {
           },
           400
         );
-
       }
     }
 
@@ -2262,7 +2892,7 @@ export default {
         request
       );
 
-    } catch (error) {
+    } catch(error) {
 
       console.error(
         "ASSETS error:",
@@ -2280,7 +2910,6 @@ export default {
           }
         }
       );
-
     }
   }
 };
