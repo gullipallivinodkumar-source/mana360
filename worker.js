@@ -15,25 +15,31 @@ const CATEGORY_FILES = {
 };
 
 const ICONS = {
-  News:"📰",
-  Tech:"📱",
-  AI:"🤖",
-  YouTube:"🎬",
-  Business:"📈",
-  Education:"🎓",
-  Devotional:"🛕",
-  Stories:"📖",
-  Tips:"💡",
-  Offers:"🏷️",
-  "Movie Reviews":"🎬",
-  "Movie News":"🍿",
-  "AI Stories":"🤖📖"
+  News: "📰",
+  Tech: "📱",
+  AI: "🤖",
+  YouTube: "🎬",
+  Business: "📈",
+  Education: "🎓",
+  Devotional: "🛕",
+  Stories: "📖",
+  Tips: "💡",
+  Offers: "🏷️",
+  "Movie Reviews": "🎬",
+  "Movie News": "🍿",
+  "AI Stories": "🤖📖"
 };
+
+const SITE_URL = "https://www.mana360.in";
 
 function b64encode(text) {
   const bytes = new TextEncoder().encode(text);
   let bin = "";
-  for (const b of bytes) bin += String.fromCharCode(b);
+
+  for (const b of bytes) {
+    bin += String.fromCharCode(b);
+  }
+
   return btoa(bin);
 }
 
@@ -52,13 +58,14 @@ function b64decode(value) {
 function esc(s = "") {
   return s.replace(
     /[&<>"']/g,
-    c => ({
-      "&":"&amp;",
-      "<":"&lt;",
-      ">":"&gt;",
-      "\"":"&quot;",
-      "'":"&#39;"
-    }[c])
+    c =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#39;"
+      }[c])
   );
 }
 
@@ -96,11 +103,11 @@ function escapeRegExp(text = "") {
 function getOldCategory(html = "") {
   for (const category of Object.keys(CATEGORY_FILES)) {
     const pattern =
-      `<span class="badge">${escapeRegExp(ICONS[category] || "📰")} ${escapeRegExp(category)}</span>`;
+      `<span class="badge">${escapeRegExp(
+        ICONS[category] || "📰"
+      )} ${escapeRegExp(category)}</span>`;
 
-    if (
-      new RegExp(pattern, "i").test(html)
-    ) {
+    if (new RegExp(pattern, "i").test(html)) {
       return category;
     }
   }
@@ -118,6 +125,98 @@ function getOldDate(html = "") {
     : nowIndia();
 }
 
+/* =========================
+   ROBOTS.TXT
+========================= */
+
+function robotsTxt() {
+  return `User-agent: *
+Allow: /
+
+Disallow: /api/
+Disallow: /admin/
+Disallow: /login/
+Disallow: /test/
+
+Sitemap: ${SITE_URL}/sitemap.xml
+`;
+}
+
+/* =========================
+   SITEMAP HELPERS
+========================= */
+
+function sitemapHeader() {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+`;
+}
+
+function sitemapFooter() {
+  return `</urlset>`;
+}
+
+async function getOrCreateSitemap(env) {
+  const existing = await getFile(env, "sitemap.xml");
+
+  if (existing) {
+    return existing;
+  }
+
+  const content =
+    sitemapHeader() +
+    `<url>
+<loc>${SITE_URL}/</loc>
+<changefreq>daily</changefreq>
+<priority>1.0</priority>
+</url>
+` +
+    sitemapFooter();
+
+  await putFile(
+    env,
+    "sitemap.xml",
+    content,
+    "Create sitemap.xml"
+  );
+
+  return await getFile(env, "sitemap.xml");
+}
+
+function addSitemapEntry(content, url) {
+  if (content.includes(url)) {
+    return content;
+  }
+
+  const entry =
+    `<url>
+<loc>${esc(url)}</loc>
+<changefreq>weekly</changefreq>
+<priority>0.7</priority>
+</url>
+`;
+
+  return content.replace(
+    "</urlset>",
+    entry + "</urlset>"
+  );
+}
+
+function removeSitemapEntry(content, url) {
+  const escaped = escapeRegExp(url);
+
+  const regex = new RegExp(
+    `<url>\\s*<loc>${escaped}<\\/loc>[\\s\\S]*?<\\/url>`,
+    "gi"
+  );
+
+  return content.replace(regex, "");
+}
+
+/* =========================
+   GITHUB
+========================= */
+
 async function gh(env, path, options = {}) {
   if (!env.GITHUB_TOKEN) {
     throw new Error(
@@ -128,10 +227,6 @@ async function gh(env, path, options = {}) {
   const repo =
     env.GITHUB_REPO ||
     "gullipallivinodkumar-source/mana360";
-
-  const branch =
-    env.GITHUB_BRANCH ||
-    "main";
 
   const url =
     `https://api.github.com/repos/${repo}/contents/${path}`;
@@ -256,6 +351,10 @@ async function deleteFile(
   });
 }
 
+/* =========================
+   ARTICLE HTML
+========================= */
+
 function articleHtml({
   title,
   description,
@@ -270,18 +369,23 @@ function articleHtml({
   return `<!doctype html>
 <html lang="te">
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>${esc(title)} | MANA360</title>
 
 <meta name="description" content="${esc(description)}">
 
-<link rel="canonical" href="https://www.mana360.in/articles/${esc(slug)}.html">
+<meta name="robots" content="index, follow">
+
+<link rel="canonical" href="${SITE_URL}/articles/${esc(slug)}.html">
 
 <link rel="stylesheet" href="../assets/style.css">
 
 <style>
+
 .article-wrap{
   padding:30px 0 70px
 }
@@ -413,6 +517,7 @@ function articleHtml({
 }
 
 @media(max-width:800px){
+
   .article-hero{
     padding:28px 21px
   }
@@ -428,8 +533,11 @@ function articleHtml({
   .article-side{
     position:static
   }
+
 }
+
 </style>
+
 </head>
 
 <body>
@@ -459,9 +567,12 @@ MANA360 Team · ${esc(date)}
 ${stripDangerous(content)}
 
 <div class="tip">
+
 <b>ముఖ్యమైన takeaway:</b>
+
 ఈ సమాచారాన్ని మీ అవసరానికి అనుగుణంగా ఉపయోగించండి.
 అవసరమైన చోట reliable sourcesతో verify చేయండి.
+
 </div>
 
 <a
@@ -509,6 +620,10 @@ href="../categories/${esc(
 </html>`;
 }
 
+/* =========================
+   HOME CARD
+========================= */
+
 function homeCard({
   title,
   category,
@@ -519,14 +634,33 @@ function homeCard({
     ICONS[category] || "📰";
 
   return `<a class="card" href="articles/${esc(slug)}.html">
-<div class="card-image">${icon}</div>
-<div class="card-body">
-<span class="category">${esc(category)}</span>
-<h3>${esc(title)}</h3>
-<div class="date">${esc(date)}</div>
+
+<div class="card-image">
+${icon}
 </div>
+
+<div class="card-body">
+
+<span class="category">
+${esc(category)}
+</span>
+
+<h3>
+${esc(title)}
+</h3>
+
+<div class="date">
+${esc(date)}
+</div>
+
+</div>
+
 </a>`;
 }
+
+/* =========================
+   CATEGORY CARD
+========================= */
 
 function catCard({
   title,
@@ -538,14 +672,33 @@ function catCard({
     ICONS[category] || "📰";
 
   return `<a class="cat-card" href="../articles/${esc(slug)}.html">
-<div class="cat-card-top">${icon}</div>
-<div class="cat-card-body">
-<small>${esc(category)}</small>
-<h3>${esc(title)}</h3>
-<p>${esc(description)}</p>
+
+<div class="cat-card-top">
+${icon}
 </div>
+
+<div class="cat-card-body">
+
+<small>
+${esc(category)}
+</small>
+
+<h3>
+${esc(title)}
+</h3>
+
+<p>
+${esc(description)}
+</p>
+
+</div>
+
 </a>`;
 }
+
+/* =========================
+   UPLOAD IMAGE
+========================= */
 
 async function uploadImage(
   env,
@@ -588,6 +741,10 @@ async function uploadImage(
 
   return `https://raw.githubusercontent.com/${repo}/${branch}/assets/images/${fileName}`;
 }
+
+/* =========================
+   PUBLISH
+========================= */
 
 async function publish(env, data) {
 
@@ -677,6 +834,8 @@ async function publish(env, data) {
     `Publish article: ${title}`
   );
 
+  /* HOME PAGE */
+
   const index =
     await getFile(
       env,
@@ -707,6 +866,7 @@ async function publish(env, data) {
     if (
       updated !== index.content
     ) {
+
       await putFile(
         env,
         "index.html",
@@ -716,6 +876,8 @@ async function publish(env, data) {
       );
     }
   }
+
+  /* CATEGORY */
 
   const catPath =
     `categories/${CATEGORY_FILES[category]}`;
@@ -750,6 +912,7 @@ async function publish(env, data) {
     if (
       updated !== cat.content
     ) {
+
       await putFile(
         env,
         catPath,
@@ -759,6 +922,8 @@ async function publish(env, data) {
       );
     }
   }
+
+  /* SEARCH */
 
   const search =
     await getFile(
@@ -805,31 +970,29 @@ async function publish(env, data) {
         );
 
       } catch (e) {}
+
     }
   }
 
+  /* SITEMAP */
+
   const sitemap =
-    await getFile(
-      env,
-      "sitemap.xml"
-    );
+    await getOrCreateSitemap(env);
 
   if (sitemap) {
 
-    const line =
-      `<url><loc>https://www.mana360.in/articles/${slug}.html</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>`;
+    const articleUrl =
+      `${SITE_URL}/articles/${slug}.html`;
+
+    const updated =
+      addSitemapEntry(
+        sitemap.content,
+        articleUrl
+      );
 
     if (
-      !sitemap.content.includes(
-        `/articles/${slug}.html`
-      )
+      updated !== sitemap.content
     ) {
-
-      const updated =
-        sitemap.content.replace(
-          "</urlset>",
-          line + "</urlset>"
-        );
 
       await putFile(
         env,
@@ -845,9 +1008,13 @@ async function publish(env, data) {
     ok: true,
     slug,
     url:
-      `https://www.mana360.in/articles/${slug}.html`
+      `${SITE_URL}/articles/${slug}.html`
   };
 }
+
+/* =========================
+   UPDATE ARTICLE
+========================= */
 
 async function updateArticle(
   env,
@@ -1204,51 +1371,34 @@ async function updateArticle(
         }
 
       } catch (e) {}
+
     }
   }
 
   /* SITEMAP */
 
   const sitemap =
-    await getFile(
-      env,
-      "sitemap.xml"
-    );
+    await getOrCreateSitemap(env);
 
   if (sitemap) {
 
-    const escapedOld =
-      escapeRegExp(
-        oldSlug
-      );
+    const oldUrl =
+      `${SITE_URL}/articles/${oldSlug}.html`;
 
-    const oldSitemapRegex =
-      new RegExp(
-        `<url>\\s*<loc>https://www\\.mana360\\.in/articles/${escapedOld}\\.html<\\/loc>[\\s\\S]*?<\\/url>`,
-        "gi"
-      );
+    const newUrl =
+      `${SITE_URL}/articles/${newSlug}.html`;
 
     let updated =
-      sitemap.content.replace(
-        oldSitemapRegex,
-        ""
+      removeSitemapEntry(
+        sitemap.content,
+        oldUrl
       );
 
-    const newEntry =
-      `<url><loc>https://www.mana360.in/articles/${esc(newSlug)}.html</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>`;
-
-    if (
-      !updated.includes(
-        `/articles/${newSlug}.html`
-      )
-    ) {
-
-      updated =
-        updated.replace(
-          "</urlset>",
-          newEntry + "</urlset>"
-        );
-    }
+    updated =
+      addSitemapEntry(
+        updated,
+        newUrl
+      );
 
     if (
       updated !== sitemap.content
@@ -1264,7 +1414,7 @@ async function updateArticle(
     }
   }
 
-  /* DELETE OLD SLUG AFTER SUCCESS */
+  /* DELETE OLD SLUG */
 
   if (newSlug !== oldSlug) {
 
@@ -1280,15 +1430,121 @@ async function updateArticle(
     ok: true,
     slug: newSlug,
     url:
-      `https://www.mana360.in/articles/${newSlug}.html`
+      `${SITE_URL}/articles/${newSlug}.html`
   };
 }
 
+/* =========================
+   MAIN WORKER
+========================= */
+
 export default {
+
   async fetch(request, env) {
 
     const url =
       new URL(request.url);
+
+    /* =========================
+       ROBOTS.TXT
+    ========================= */
+
+    if (
+      url.pathname === "/robots.txt" &&
+      request.method === "GET"
+    ) {
+
+      return new Response(
+        robotsTxt(),
+        {
+          status: 200,
+          headers: {
+            "content-type":
+              "text/plain; charset=UTF-8",
+            "cache-control":
+              "public, max-age=3600"
+          }
+        }
+      );
+    }
+
+    /* =========================
+       SITEMAP.XML
+    ========================= */
+
+    if (
+      url.pathname === "/sitemap.xml" &&
+      request.method === "GET"
+    ) {
+
+      try {
+
+        const sitemap =
+          await getFile(
+            env,
+            "sitemap.xml"
+          );
+
+        if (!sitemap) {
+
+          const content =
+            sitemapHeader() +
+            `<url>
+<loc>${SITE_URL}/</loc>
+<changefreq>daily</changefreq>
+<priority>1.0</priority>
+</url>
+` +
+            sitemapFooter();
+
+          return new Response(
+            content,
+            {
+              status: 200,
+              headers: {
+                "content-type":
+                  "application/xml; charset=UTF-8",
+                "cache-control":
+                  "public, max-age=3600"
+              }
+            }
+          );
+        }
+
+        return new Response(
+          sitemap.content,
+          {
+            status: 200,
+            headers: {
+              "content-type":
+                "application/xml; charset=UTF-8",
+              "cache-control":
+                "public, max-age=3600"
+            }
+          }
+        );
+
+      } catch (e) {
+
+        return new Response(
+          sitemapHeader() +
+          `<url>
+<loc>${SITE_URL}/</loc>
+<changefreq>daily</changefreq>
+<priority>1.0</priority>
+</url>
+` +
+          sitemapFooter(),
+          {
+            status: 200,
+            headers: {
+              "content-type":
+                "application/xml; charset=UTF-8"
+            }
+          }
+        );
+      }
+    }
 
     /* =========================
        GET ARTICLES
@@ -1307,6 +1563,7 @@ export default {
           ) || "";
 
         if (!env.ADMIN_PASSWORD) {
+
           return new Response(
             JSON.stringify({
               error:
@@ -1326,6 +1583,7 @@ export default {
           password !==
           env.ADMIN_PASSWORD
         ) {
+
           return new Response(
             JSON.stringify({
               error:
@@ -1420,6 +1678,7 @@ export default {
           ) || "";
 
         if (!env.ADMIN_PASSWORD) {
+
           return new Response(
             JSON.stringify({
               error:
@@ -1439,6 +1698,7 @@ export default {
           password !==
           env.ADMIN_PASSWORD
         ) {
+
           return new Response(
             JSON.stringify({
               error:
@@ -1460,6 +1720,7 @@ export default {
           ) || "";
 
         if (!slug) {
+
           return new Response(
             JSON.stringify({
               error:
@@ -1485,6 +1746,7 @@ export default {
           );
 
         if (!file) {
+
           return new Response(
             JSON.stringify({
               error:
@@ -1549,6 +1811,7 @@ export default {
           ) || "";
 
         if (!env.ADMIN_PASSWORD) {
+
           return new Response(
             JSON.stringify({
               error:
@@ -1568,6 +1831,7 @@ export default {
           password !==
           env.ADMIN_PASSWORD
         ) {
+
           return new Response(
             JSON.stringify({
               error:
@@ -1606,6 +1870,7 @@ export default {
           !fileName ||
           !base64
         ) {
+
           throw new Error(
             "Image file and data are required."
           );
@@ -1616,6 +1881,7 @@ export default {
             fileName
           )
         ) {
+
           throw new Error(
             "Only JPG, PNG and WebP images are allowed."
           );
@@ -1676,6 +1942,7 @@ export default {
           ) || "";
 
         if (!env.ADMIN_PASSWORD) {
+
           return new Response(
             JSON.stringify({
               error:
@@ -1695,6 +1962,7 @@ export default {
           password !==
           env.ADMIN_PASSWORD
         ) {
+
           return new Response(
             JSON.stringify({
               error:
@@ -1764,6 +2032,7 @@ export default {
           ) || "";
 
         if (!env.ADMIN_PASSWORD) {
+
           return new Response(
             JSON.stringify({
               error:
@@ -1783,6 +2052,7 @@ export default {
           password !==
           env.ADMIN_PASSWORD
         ) {
+
           return new Response(
             JSON.stringify({
               error:
@@ -1834,6 +2104,10 @@ export default {
         );
       }
     }
+
+    /* =========================
+       STATIC ASSETS
+    ========================= */
 
     return env.ASSETS.fetch(
       request
