@@ -30,19 +30,11 @@ const ICONS = {
   "AI Stories": "🤖📖"
 };
 
-/*
-========================================================
-MANA360 CANONICAL WEBSITE
-========================================================
-*/
-
 const SITE_URL = "https://www.mana360.in";
 
-/*
-========================================================
-BASE64
-========================================================
-*/
+/* =====================================================
+   BASE64
+===================================================== */
 
 function b64encode(text) {
   const bytes = new TextEncoder().encode(text);
@@ -68,11 +60,9 @@ function b64decode(value) {
   return new TextDecoder().decode(bytes);
 }
 
-/*
-========================================================
-ESCAPE HTML
-========================================================
-*/
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
 
 function esc(value = "") {
   return String(value).replace(
@@ -88,11 +78,9 @@ function esc(value = "") {
   );
 }
 
-/*
-========================================================
-SLUG
-========================================================
-*/
+/* =====================================================
+   SLUG
+===================================================== */
 
 function safeSlug(value = "") {
   return String(value)
@@ -105,11 +93,9 @@ function safeSlug(value = "") {
     .slice(0, 90);
 }
 
-/*
-========================================================
-REMOVE DANGEROUS HTML
-========================================================
-*/
+/* =====================================================
+   REMOVE DANGEROUS HTML
+===================================================== */
 
 function stripDangerous(html = "") {
   return String(html).replace(
@@ -118,11 +104,9 @@ function stripDangerous(html = "") {
   );
 }
 
-/*
-========================================================
-INDIA DATE
-========================================================
-*/
+/* =====================================================
+   INDIA DATE
+===================================================== */
 
 function nowIndia() {
   return new Intl.DateTimeFormat("en-US", {
@@ -133,11 +117,9 @@ function nowIndia() {
   }).format(new Date());
 }
 
-/*
-========================================================
-REGEX ESCAPE
-========================================================
-*/
+/* =====================================================
+   REGEX ESCAPE
+===================================================== */
 
 function escapeRegExp(text = "") {
   return String(text).replace(
@@ -146,11 +128,9 @@ function escapeRegExp(text = "") {
   );
 }
 
-/*
-========================================================
-OLD ARTICLE CATEGORY
-========================================================
-*/
+/* =====================================================
+   OLD ARTICLE CATEGORY
+===================================================== */
 
 function getOldCategory(html = "") {
   for (const category of Object.keys(CATEGORY_FILES)) {
@@ -159,9 +139,7 @@ function getOldCategory(html = "") {
     const pattern =
       `<span class="badge">${escapeRegExp(icon)} ${escapeRegExp(category)}</span>`;
 
-    if (
-      new RegExp(pattern, "i").test(html)
-    ) {
+    if (new RegExp(pattern, "i").test(html)) {
       return category;
     }
   }
@@ -169,11 +147,9 @@ function getOldCategory(html = "") {
   return "";
 }
 
-/*
-========================================================
-OLD ARTICLE DATE
-========================================================
-*/
+/* =====================================================
+   OLD ARTICLE DATE
+===================================================== */
 
 function getOldDate(html = "") {
   const match = html.match(
@@ -185,11 +161,9 @@ function getOldDate(html = "") {
     : nowIndia();
 }
 
-/*
-========================================================
-ROBOTS.TXT
-========================================================
-*/
+/* =====================================================
+   ROBOTS.TXT
+===================================================== */
 
 function robotsTxt() {
   return `# MANA360 robots.txt
@@ -206,11 +180,9 @@ Sitemap: ${SITE_URL}/sitemap.xml
 `;
 }
 
-/*
-========================================================
-SITEMAP
-========================================================
-*/
+/* =====================================================
+   SITEMAP
+===================================================== */
 
 function sitemapHeader() {
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -223,10 +195,7 @@ function sitemapFooter() {
 }
 
 async function getOrCreateSitemap(env) {
-  const existing = await getFile(
-    env,
-    "sitemap.xml"
-  );
+  const existing = await getFile(env, "sitemap.xml");
 
   if (existing) {
     return existing;
@@ -255,15 +224,8 @@ async function getOrCreateSitemap(env) {
   );
 }
 
-function addSitemapEntry(
-  content,
-  url
-) {
-  if (
-    content.includes(
-      `<loc>${url}</loc>`
-    )
-  ) {
+function addSitemapEntry(content, url) {
+  if (content.includes(`<loc>${url}</loc>`)) {
     return content;
   }
 
@@ -281,36 +243,22 @@ function addSitemapEntry(
   );
 }
 
-function removeSitemapEntry(
-  content,
-  url
-) {
-  const escaped =
-    escapeRegExp(url);
+function removeSitemapEntry(content, url) {
+  const escaped = escapeRegExp(url);
 
-  const regex =
-    new RegExp(
-      `<url>\\s*<loc>${escaped}<\\/loc>[\\s\\S]*?<\\/url>`,
-      "gi"
-    );
-
-  return content.replace(
-    regex,
-    ""
+  const regex = new RegExp(
+    `<url>\\s*<loc>${escaped}<\\/loc>[\\s\\S]*?<\\/url>`,
+    "gi"
   );
+
+  return content.replace(regex, "");
 }
 
-/*
-========================================================
-GITHUB API
-========================================================
-*/
+/* =====================================================
+   GITHUB API
+===================================================== */
 
-async function gh(
-  env,
-  path,
-  options = {}
-) {
+async function gh(env, path, options = {}) {
   if (!env.GITHUB_TOKEN) {
     throw new Error(
       "GITHUB_TOKEN is not configured in Cloudflare."
@@ -325,34 +273,21 @@ async function gh(
     `https://api.github.com/repos/${repo}/contents/${path}`;
 
   const headers = {
-    "Authorization":
-      `Bearer ${env.GITHUB_TOKEN}`,
-
-    "Accept":
-      "application/vnd.github+json",
-
-    "X-GitHub-Api-Version":
-      "2022-11-28",
-
-    "User-Agent":
-      "MANA360-CMS"
+    "Authorization": `Bearer ${env.GITHUB_TOKEN}`,
+    "Accept": "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
+    "User-Agent": "MANA360-CMS"
   };
 
-  const response =
-    await fetch(
-      url,
-      {
-        ...options,
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      ...headers,
+      ...(options.headers || {})
+    }
+  });
 
-        headers: {
-          ...headers,
-          ...(options.headers || {})
-        }
-      }
-    );
-
-  const text =
-    await response.text();
+  const text = await response.text();
 
   if (!response.ok) {
     throw new Error(
@@ -360,21 +295,14 @@ async function gh(
     );
   }
 
-  return text
-    ? JSON.parse(text)
-    : {};
+  return text ? JSON.parse(text) : {};
 }
 
-/*
-========================================================
-GET FILE FROM GITHUB
-========================================================
-*/
+/* =====================================================
+   GET FILE FROM GITHUB
+===================================================== */
 
-async function getFile(
-  env,
-  path
-) {
+async function getFile(env, path) {
   const repo =
     env.GITHUB_REPO ||
     "gullipallivinodkumar-source/mana360";
@@ -387,35 +315,21 @@ async function getFile(
     `https://api.github.com/repos/${repo}/contents/${path}?ref=${encodeURIComponent(branch)}`;
 
   const headers = {
-    "Authorization":
-      `Bearer ${env.GITHUB_TOKEN}`,
-
-    "Accept":
-      "application/vnd.github+json",
-
-    "X-GitHub-Api-Version":
-      "2022-11-28",
-
-    "User-Agent":
-      "MANA360-CMS"
+    "Authorization": `Bearer ${env.GITHUB_TOKEN}`,
+    "Accept": "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
+    "User-Agent": "MANA360-CMS"
   };
 
-  const response =
-    await fetch(
-      url,
-      {
-        headers
-      }
-    );
+  const response = await fetch(url, {
+    headers
+  });
 
-  if (
-    response.status === 404
-  ) {
+  if (response.status === 404) {
     return null;
   }
 
-  const text =
-    await response.text();
+  const text = await response.text();
 
   if (!response.ok) {
     throw new Error(
@@ -423,24 +337,17 @@ async function getFile(
     );
   }
 
-  const json =
-    JSON.parse(text);
+  const json = JSON.parse(text);
 
   return {
     sha: json.sha,
-
-    content:
-      b64decode(
-        json.content || ""
-      )
+    content: b64decode(json.content || "")
   };
 }
 
-/*
-========================================================
-PUT FILE
-========================================================
-*/
+/* =====================================================
+   PUT FILE
+===================================================== */
 
 async function putFile(
   env,
@@ -455,8 +362,7 @@ async function putFile(
 
   const body = {
     message,
-    content:
-      b64encode(content),
+    content: b64encode(content),
     branch
   };
 
@@ -464,28 +370,20 @@ async function putFile(
     body.sha = sha;
   }
 
-  return gh(
-    env,
-    path,
-    {
-      method: "PUT",
+  return gh(env, path, {
+    method: "PUT",
 
-      headers: {
-        "Content-Type":
-          "application/json"
-      },
+    headers: {
+      "Content-Type": "application/json"
+    },
 
-      body:
-        JSON.stringify(body)
-    }
-  );
+    body: JSON.stringify(body)
+  });
 }
 
-/*
-========================================================
-DELETE FILE
-========================================================
-*/
+/* =====================================================
+   DELETE FILE
+===================================================== */
 
 async function deleteFile(
   env,
@@ -497,32 +395,24 @@ async function deleteFile(
     env.GITHUB_BRANCH ||
     "main";
 
-  return gh(
-    env,
-    path,
-    {
-      method: "DELETE",
+  return gh(env, path, {
+    method: "DELETE",
 
-      headers: {
-        "Content-Type":
-          "application/json"
-      },
+    headers: {
+      "Content-Type": "application/json"
+    },
 
-      body:
-        JSON.stringify({
-          message,
-          sha,
-          branch
-        })
-    }
-  );
+    body: JSON.stringify({
+      message,
+      sha,
+      branch
+    })
+  });
 }
 
-/*
-========================================================
-ARTICLE HTML
-========================================================
-*/
+/* =====================================================
+   ARTICLE HTML
+===================================================== */
 
 function articleHtml({
   title,
@@ -538,6 +428,7 @@ function articleHtml({
 
   return `<!doctype html>
 <html lang="te">
+
 <head>
 
 <meta charset="UTF-8">
@@ -896,11 +787,9 @@ class="article-side">
 </html>`;
 }
 
-/*
-========================================================
-HOME CARD
-========================================================
-*/
+/* =====================================================
+   HOME CARD
+===================================================== */
 
 function homeCard({
   title,
@@ -939,11 +828,9 @@ ${esc(date)}
 </a>`;
 }
 
-/*
-========================================================
-CATEGORY CARD
-========================================================
-*/
+/* =====================================================
+   CATEGORY CARD
+===================================================== */
 
 function catCard({
   title,
@@ -982,11 +869,9 @@ ${esc(description)}
 </a>`;
 }
 
-/*
-========================================================
-UPLOAD IMAGE
-========================================================
-*/
+/* =====================================================
+   UPLOAD IMAGE
+===================================================== */
 
 async function uploadImage(
   env,
@@ -997,10 +882,7 @@ async function uploadImage(
     `assets/images/${fileName}`;
 
   const existing =
-    await getFile(
-      env,
-      path
-    );
+    await getFile(env, path);
 
   const repo =
     env.GITHUB_REPO ||
@@ -1025,46 +907,35 @@ async function uploadImage(
       existing.sha;
   }
 
-  await gh(
-    env,
-    path,
-    {
-      method: "PUT",
+  await gh(env, path, {
+    method: "PUT",
 
-      headers: {
-        "Content-Type":
-          "application/json"
-      },
+    headers: {
+      "Content-Type":
+        "application/json"
+    },
 
-      body:
-        JSON.stringify(body)
-    }
-  );
+    body:
+      JSON.stringify(body)
+  });
 
   return `https://raw.githubusercontent.com/${repo}/${branch}/assets/images/${fileName}`;
 }
 
-/*
-========================================================
-PUBLISH ARTICLE
-========================================================
-*/
+/* =====================================================
+   PUBLISH ARTICLE
+===================================================== */
 
-async function publish(
-  env,
-  data
-) {
+async function publish(env, data) {
+
   const title =
-    String(data.title || "")
-      .trim();
+    String(data.title || "").trim();
 
   const description =
-    String(data.description || "")
-      .trim();
+    String(data.description || "").trim();
 
   const category =
-    String(data.category || "")
-      .trim();
+    String(data.category || "").trim();
 
   const content =
     stripDangerous(
@@ -1082,9 +953,7 @@ async function publish(
     );
   }
 
-  if (
-    !CATEGORY_FILES[category]
-  ) {
+  if (!CATEGORY_FILES[category]) {
     throw new Error(
       "Invalid category."
     );
@@ -1092,8 +961,7 @@ async function publish(
 
   const slug =
     safeSlug(
-      data.slug ||
-      title
+      data.slug || title
     );
 
   if (!slug) {
@@ -1148,11 +1016,7 @@ async function publish(
     `Publish article: ${title}`
   );
 
-  /*
-  ========================
-  HOME PAGE
-  ========================
-  */
+  /* HOME */
 
   const index =
     await getFile(
@@ -1161,6 +1025,7 @@ async function publish(
     );
 
   if (index) {
+
     const marker =
       '<div class="grid">';
 
@@ -1180,10 +1045,8 @@ async function publish(
           )
         : index.content;
 
-    if (
-      updated !==
-      index.content
-    ) {
+    if (updated !== index.content) {
+
       await putFile(
         env,
         "index.html",
@@ -1191,14 +1054,11 @@ async function publish(
         `Add ${title} to homepage`,
         index.sha
       );
+
     }
   }
 
-  /*
-  ========================
-  CATEGORY
-  ========================
-  */
+  /* CATEGORY */
 
   const categoryPath =
     `categories/${CATEGORY_FILES[category]}`;
@@ -1210,6 +1070,7 @@ async function publish(
     );
 
   if (categoryFile) {
+
     const marker =
       '<section class="cat-grid">';
 
@@ -1222,19 +1083,15 @@ async function publish(
       });
 
     const updated =
-      categoryFile.content.includes(
-        marker
-      )
+      categoryFile.content.includes(marker)
         ? categoryFile.content.replace(
             marker,
             marker + card
           )
         : categoryFile.content;
 
-    if (
-      updated !==
-      categoryFile.content
-    ) {
+    if (updated !== categoryFile.content) {
+
       await putFile(
         env,
         categoryPath,
@@ -1242,14 +1099,11 @@ async function publish(
         `Add ${title} to ${category} category`,
         categoryFile.sha
       );
+
     }
   }
 
-  /*
-  ========================
-  SEARCH
-  ========================
-  */
+  /* SEARCH */
 
   const search =
     await getFile(
@@ -1258,17 +1112,18 @@ async function publish(
     );
 
   if (search) {
+
     const match =
       search.content.match(
         /const data=(\[.*?\]);/s
       );
 
     if (match) {
+
       try {
+
         const array =
-          JSON.parse(
-            match[1]
-          );
+          JSON.parse(match[1]);
 
         array.unshift({
           title,
@@ -1287,10 +1142,8 @@ async function publish(
             )};`
           );
 
-        if (
-          updated !==
-          search.content
-        ) {
+        if (updated !== search.content) {
+
           await putFile(
             env,
             "search.html",
@@ -1298,28 +1151,27 @@ async function publish(
             `Add ${title} to search index`,
             search.sha
           );
+
         }
+
       } catch (error) {
+
         console.log(
           "Search update skipped:",
           error
         );
+
       }
     }
   }
 
-  /*
-  ========================
-  SITEMAP
-  ========================
-  */
+  /* SITEMAP */
 
   const sitemap =
-    await getOrCreateSitemap(
-      env
-    );
+    await getOrCreateSitemap(env);
 
   if (sitemap) {
+
     const articleUrl =
       `${SITE_URL}/articles/${slug}.html`;
 
@@ -1329,10 +1181,8 @@ async function publish(
         articleUrl
       );
 
-    if (
-      updated !==
-      sitemap.content
-    ) {
+    if (updated !== sitemap.content) {
+
       await putFile(
         env,
         "sitemap.xml",
@@ -1340,45 +1190,40 @@ async function publish(
         `Add ${title} to sitemap`,
         sitemap.sha
       );
+
     }
   }
 
   return {
     ok: true,
-
     slug,
-
     url:
       `${SITE_URL}/articles/${slug}.html`
   };
 }
 
-/*
-========================================================
-UPDATE ARTICLE
-========================================================
-*/
+/* =====================================================
+   UPDATE ARTICLE
+===================================================== */
 
 async function updateArticle(
   env,
   data
 ) {
+
   const oldSlug =
     safeSlug(
       data.oldSlug || ""
     );
 
   const title =
-    String(data.title || "")
-      .trim();
+    String(data.title || "").trim();
 
   const description =
-    String(data.description || "")
-      .trim();
+    String(data.description || "").trim();
 
   const category =
-    String(data.category || "")
-      .trim();
+    String(data.category || "").trim();
 
   const content =
     stripDangerous(
@@ -1387,8 +1232,7 @@ async function updateArticle(
 
   const newSlug =
     safeSlug(
-      data.slug ||
-      title
+      data.slug || title
     );
 
   if (
@@ -1404,9 +1248,7 @@ async function updateArticle(
     );
   }
 
-  if (
-    !CATEGORY_FILES[category]
-  ) {
+  if (!CATEGORY_FILES[category]) {
     throw new Error(
       "Invalid category."
     );
@@ -1437,9 +1279,8 @@ async function updateArticle(
       oldFile.content
     );
 
-  if (
-    newSlug !== oldSlug
-  ) {
+  if (newSlug !== oldSlug) {
+
     const newExisting =
       await getFile(
         env,
@@ -1466,9 +1307,8 @@ async function updateArticle(
   const newPath =
     `articles/${newSlug}.html`;
 
-  if (
-    newSlug === oldSlug
-  ) {
+  if (newSlug === oldSlug) {
+
     await putFile(
       env,
       oldPath,
@@ -1476,20 +1316,19 @@ async function updateArticle(
       `Update article: ${title}`,
       oldFile.sha
     );
+
   } else {
+
     await putFile(
       env,
       newPath,
       newHtml,
       `Update article: ${title}`
     );
+
   }
 
-  /*
-  ========================
-  HOME
-  ========================
-  */
+  /* HOME */
 
   const index =
     await getFile(
@@ -1498,10 +1337,9 @@ async function updateArticle(
     );
 
   if (index) {
+
     const escaped =
-      escapeRegExp(
-        oldSlug
-      );
+      escapeRegExp(oldSlug);
 
     const oldCardRegex =
       new RegExp(
@@ -1526,22 +1364,18 @@ async function updateArticle(
         date
       });
 
-    if (
-      updated.includes(
-        marker
-      )
-    ) {
+    if (updated.includes(marker)) {
+
       updated =
         updated.replace(
           marker,
           marker + newCard
         );
+
     }
 
-    if (
-      updated !==
-      index.content
-    ) {
+    if (updated !== index.content) {
+
       await putFile(
         env,
         "index.html",
@@ -1549,19 +1383,17 @@ async function updateArticle(
         `Update ${title} on homepage`,
         index.sha
       );
+
     }
   }
 
-  /*
-  ========================
-  OLD CATEGORY
-  ========================
-  */
+  /* OLD CATEGORY */
 
   if (
     oldCategory &&
     CATEGORY_FILES[oldCategory]
   ) {
+
     const oldCategoryPath =
       `categories/${CATEGORY_FILES[oldCategory]}`;
 
@@ -1572,10 +1404,9 @@ async function updateArticle(
       );
 
     if (oldCategoryFile) {
+
       const escaped =
-        escapeRegExp(
-          oldSlug
-        );
+        escapeRegExp(oldSlug);
 
       const oldCategoryRegex =
         new RegExp(
@@ -1593,6 +1424,7 @@ async function updateArticle(
         updated !==
         oldCategoryFile.content
       ) {
+
         await putFile(
           env,
           oldCategoryPath,
@@ -1600,15 +1432,12 @@ async function updateArticle(
           `Remove old article from ${oldCategory}`,
           oldCategoryFile.sha
         );
+
       }
     }
   }
 
-  /*
-  ========================
-  NEW CATEGORY
-  ========================
-  */
+  /* NEW CATEGORY */
 
   const newCategoryPath =
     `categories/${CATEGORY_FILES[category]}`;
@@ -1620,10 +1449,9 @@ async function updateArticle(
     );
 
   if (newCategoryFile) {
+
     const escaped =
-      escapeRegExp(
-        newSlug
-      );
+      escapeRegExp(newSlug);
 
     const existingRegex =
       new RegExp(
@@ -1648,22 +1476,21 @@ async function updateArticle(
         description
       });
 
-    if (
-      updated.includes(
-        marker
-      )
-    ) {
+    if (updated.includes(marker)) {
+
       updated =
         updated.replace(
           marker,
           marker + newCard
         );
+
     }
 
     if (
       updated !==
       newCategoryFile.content
     ) {
+
       await putFile(
         env,
         newCategoryPath,
@@ -1671,14 +1498,11 @@ async function updateArticle(
         `Update ${title} in ${category} category`,
         newCategoryFile.sha
       );
+
     }
   }
 
-  /*
-  ========================
-  SEARCH
-  ========================
-  */
+  /* SEARCH */
 
   const search =
     await getFile(
@@ -1687,17 +1511,18 @@ async function updateArticle(
     );
 
   if (search) {
+
     const match =
       search.content.match(
         /const data=(\[.*?\]);/s
       );
 
     if (match) {
+
       try {
+
         const array =
-          JSON.parse(
-            match[1]
-          );
+          JSON.parse(match[1]);
 
         const filtered =
           array.filter(
@@ -1727,6 +1552,7 @@ async function updateArticle(
           updated !==
           search.content
         ) {
+
           await putFile(
             env,
             "search.html",
@@ -1734,28 +1560,27 @@ async function updateArticle(
             `Update ${title} in search index`,
             search.sha
           );
+
         }
+
       } catch (error) {
+
         console.log(
           "Search update skipped:",
           error
         );
+
       }
     }
   }
 
-  /*
-  ========================
-  SITEMAP
-  ========================
-  */
+  /* SITEMAP */
 
   const sitemap =
-    await getOrCreateSitemap(
-      env
-    );
+    await getOrCreateSitemap(env);
 
   if (sitemap) {
+
     const oldUrl =
       `${SITE_URL}/articles/${oldSlug}.html`;
 
@@ -1778,6 +1603,7 @@ async function updateArticle(
       updated !==
       sitemap.content
     ) {
+
       await putFile(
         env,
         "sitemap.xml",
@@ -1785,24 +1611,21 @@ async function updateArticle(
         `Update ${title} in sitemap`,
         sitemap.sha
       );
+
     }
   }
 
-  /*
-  ========================
-  DELETE OLD SLUG
-  ========================
-  */
+  /* DELETE OLD SLUG */
 
-  if (
-    newSlug !== oldSlug
-  ) {
+  if (newSlug !== oldSlug) {
+
     await deleteFile(
       env,
       oldPath,
       oldFile.sha,
       `Remove old article: ${oldSlug}`
     );
+
   }
 
   return {
@@ -1816,11 +1639,9 @@ async function updateArticle(
   };
 }
 
-/*
-========================================================
-JSON RESPONSE
-========================================================
-*/
+/* =====================================================
+   JSON RESPONSE
+===================================================== */
 
 function jsonResponse(
   data,
@@ -1842,23 +1663,26 @@ function jsonResponse(
   );
 }
 
-/*
-========================================================
-ADMIN AUTH
-========================================================
-*/
+/* =====================================================
+   ADMIN AUTH
+===================================================== */
 
 function checkAdmin(
   request,
   env
 ) {
+
   if (!env.ADMIN_PASSWORD) {
+
     return {
       ok: false,
+
       status: 500,
+
       error:
         "ADMIN_PASSWORD is not configured in Cloudflare."
     };
+
   }
 
   const password =
@@ -1870,12 +1694,16 @@ function checkAdmin(
     password !==
     env.ADMIN_PASSWORD
   ) {
+
     return {
       ok: false,
+
       status: 401,
+
       error:
         "Wrong admin password."
     };
+
   }
 
   return {
@@ -1883,11 +1711,9 @@ function checkAdmin(
   };
 }
 
-/*
-========================================================
-MAIN WORKER
-========================================================
-*/
+/* =====================================================
+   MAIN WORKER
+===================================================== */
 
 export default {
 
@@ -1903,36 +1729,26 @@ export default {
       );
 
     /*
-    ======================================================
-    CANONICAL DOMAIN REDIRECT
-    mana360.in -> www.mana360.in
-    ======================================================
+    =====================================================
+    IMPORTANT:
+    NO DOMAIN REDIRECT HERE.
+
+    Cloudflare handles the canonical domain.
+    This prevents:
+
+    mana360.in
+        ↓
+    www.mana360.in
+        ↓
+    mana360.in
+        ↓
+    LOOP
+    =====================================================
     */
 
-    if (
-      url.hostname ===
-      "mana360.in"
-    ) {
-
-      const redirectUrl =
-        new URL(
-          request.url
-        );
-
-      redirectUrl.hostname =
-        "www.mana360.in";
-
-      return Response.redirect(
-        redirectUrl.toString(),
-        301
-      );
-    }
-
-    /*
-    ======================================================
-    ROBOTS.TXT
-    ======================================================
-    */
+    /* ===================================================
+       ROBOTS.TXT
+    =================================================== */
 
     if (
       url.pathname ===
@@ -1955,13 +1771,12 @@ export default {
           }
         }
       );
+
     }
 
-    /*
-    ======================================================
-    SITEMAP.XML
-    ======================================================
-    */
+    /* ===================================================
+       SITEMAP.XML
+    =================================================== */
 
     if (
       url.pathname ===
@@ -2004,6 +1819,7 @@ export default {
               }
             }
           );
+
         }
 
         return new Response(
@@ -2041,14 +1857,13 @@ export default {
             }
           }
         );
+
       }
     }
 
-    /*
-    ======================================================
-    GET ARTICLES
-    ======================================================
-    */
+    /* ===================================================
+       GET ARTICLES
+    =================================================== */
 
     if (
       url.pathname ===
@@ -2066,6 +1881,7 @@ export default {
           );
 
         if (!auth.ok) {
+
           return jsonResponse(
             {
               error:
@@ -2073,6 +1889,7 @@ export default {
             },
             auth.status
           );
+
         }
 
         const files =
@@ -2092,11 +1909,8 @@ export default {
           )
             .filter(
               file =>
-                file.type ===
-                  "file" &&
-                file.name.endsWith(
-                  ".html"
-                )
+                file.type === "file" &&
+                file.name.endsWith(".html")
             )
             .map(
               file => ({
@@ -2129,14 +1943,13 @@ export default {
           },
           400
         );
+
       }
     }
 
-    /*
-    ======================================================
-    GET SINGLE ARTICLE
-    ======================================================
-    */
+    /* ===================================================
+       GET SINGLE ARTICLE
+    =================================================== */
 
     if (
       url.pathname ===
@@ -2154,6 +1967,7 @@ export default {
           );
 
         if (!auth.ok) {
+
           return jsonResponse(
             {
               error:
@@ -2161,6 +1975,7 @@ export default {
             },
             auth.status
           );
+
         }
 
         const slug =
@@ -2169,6 +1984,7 @@ export default {
           ) || "";
 
         if (!slug) {
+
           return jsonResponse(
             {
               error:
@@ -2176,12 +1992,11 @@ export default {
             },
             400
           );
+
         }
 
         const cleanSlug =
-          safeSlug(
-            slug
-          );
+          safeSlug(slug);
 
         const file =
           await getFile(
@@ -2190,6 +2005,7 @@ export default {
           );
 
         if (!file) {
+
           return jsonResponse(
             {
               error:
@@ -2197,6 +2013,7 @@ export default {
             },
             404
           );
+
         }
 
         return jsonResponse({
@@ -2216,14 +2033,13 @@ export default {
           },
           400
         );
+
       }
     }
 
-    /*
-    ======================================================
-    UPLOAD IMAGE
-    ======================================================
-    */
+    /* ===================================================
+       UPLOAD IMAGE
+    =================================================== */
 
     if (
       url.pathname ===
@@ -2241,6 +2057,7 @@ export default {
           );
 
         if (!auth.ok) {
+
           return jsonResponse(
             {
               error:
@@ -2248,6 +2065,7 @@ export default {
             },
             auth.status
           );
+
         }
 
         const data =
@@ -2273,9 +2091,11 @@ export default {
           !fileName ||
           !base64
         ) {
+
           throw new Error(
             "Image file and data are required."
           );
+
         }
 
         if (
@@ -2283,9 +2103,11 @@ export default {
             fileName
           )
         ) {
+
           throw new Error(
             "Only JPG, PNG and WebP images are allowed."
           );
+
         }
 
         const imageUrl =
@@ -2310,14 +2132,13 @@ export default {
           },
           400
         );
+
       }
     }
 
-    /*
-    ======================================================
-    UPDATE ARTICLE
-    ======================================================
-    */
+    /* ===================================================
+       UPDATE ARTICLE
+    =================================================== */
 
     if (
       url.pathname ===
@@ -2335,6 +2156,7 @@ export default {
           );
 
         if (!auth.ok) {
+
           return jsonResponse(
             {
               error:
@@ -2342,6 +2164,7 @@ export default {
             },
             auth.status
           );
+
         }
 
         const data =
@@ -2367,14 +2190,13 @@ export default {
           },
           400
         );
+
       }
     }
 
-    /*
-    ======================================================
-    PUBLISH ARTICLE
-    ======================================================
-    */
+    /* ===================================================
+       PUBLISH ARTICLE
+    =================================================== */
 
     if (
       url.pathname ===
@@ -2392,6 +2214,7 @@ export default {
           );
 
         if (!auth.ok) {
+
           return jsonResponse(
             {
               error:
@@ -2399,6 +2222,7 @@ export default {
             },
             auth.status
           );
+
         }
 
         const data =
@@ -2424,14 +2248,13 @@ export default {
           },
           400
         );
+
       }
     }
 
-    /*
-    ======================================================
-    STATIC WEBSITE
-    ======================================================
-    */
+    /* ===================================================
+       STATIC WEBSITE
+    =================================================== */
 
     try {
 
@@ -2440,6 +2263,11 @@ export default {
       );
 
     } catch (error) {
+
+      console.error(
+        "ASSETS error:",
+        error
+      );
 
       return new Response(
         "Page Not Found",
@@ -2452,6 +2280,7 @@ export default {
           }
         }
       );
+
     }
   }
 };
