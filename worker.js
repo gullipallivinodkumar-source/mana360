@@ -15,62 +15,87 @@ const CATEGORY_FILES = {
 };
 
 const ICONS = {
-  News: "📰",
-  Tech: "📱",
-  AI: "🤖",
-  YouTube: "🎬",
-  Business: "📈",
-  Education: "🎓",
-  Devotional: "🛕",
-  Stories: "📖",
-  Tips: "💡",
-  Offers: "🏷️",
+  "News": "📰",
+  "Tech": "📱",
+  "AI": "🤖",
+  "YouTube": "🎬",
+  "Business": "📈",
+  "Education": "🎓",
+  "Devotional": "🛕",
+  "Stories": "📖",
+  "Tips": "💡",
+  "Offers": "🏷️",
   "Movie Reviews": "🎬",
   "Movie News": "🍿",
   "AI Stories": "🤖📖"
 };
 
+/*
+========================================================
+MANA360 CANONICAL WEBSITE
+========================================================
+*/
+
 const SITE_URL = "https://www.mana360.in";
+
+/*
+========================================================
+BASE64
+========================================================
+*/
 
 function b64encode(text) {
   const bytes = new TextEncoder().encode(text);
-  let bin = "";
+  let binary = "";
 
-  for (const b of bytes) {
-    bin += String.fromCharCode(b);
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte);
   }
 
-  return btoa(bin);
+  return btoa(binary);
 }
 
 function b64decode(value) {
-  const clean = value.replace(/\n/g, "");
-  const bin = atob(clean);
-  const bytes = new Uint8Array(bin.length);
+  const clean = String(value || "").replace(/\n/g, "");
+  const binary = atob(clean);
 
-  for (let i = 0; i < bin.length; i++) {
-    bytes[i] = bin.charCodeAt(i);
+  const bytes = new Uint8Array(binary.length);
+
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
   }
 
   return new TextDecoder().decode(bytes);
 }
 
-function esc(s = "") {
-  return s.replace(
+/*
+========================================================
+ESCAPE HTML
+========================================================
+*/
+
+function esc(value = "") {
+  return String(value).replace(
     /[&<>"']/g,
-    c =>
+    char =>
       ({
         "&": "&amp;",
         "<": "&lt;",
         ">": "&gt;",
-        "\"": "&quot;",
+        '"': "&quot;",
         "'": "&#39;"
-      }[c])
+      }[char])
   );
 }
 
-function safeSlug(s = "") {
-  return s
+/*
+========================================================
+SLUG
+========================================================
+*/
+
+function safeSlug(value = "") {
+  return String(value)
     .toLowerCase()
     .trim()
     .replace(/[^a-z0-9\s-]/g, "")
@@ -80,12 +105,24 @@ function safeSlug(s = "") {
     .slice(0, 90);
 }
 
+/*
+========================================================
+REMOVE DANGEROUS HTML
+========================================================
+*/
+
 function stripDangerous(html = "") {
-  return html.replace(
-    /<\/?(script|style|iframe|object|embed|form|input|button)[^>]*>/gi,
+  return String(html).replace(
+    /<\/?(script|style|iframe|object|embed|form|input|button|textarea|select|option|link|meta)[^>]*>/gi,
     ""
   );
 }
+
+/*
+========================================================
+INDIA DATE
+========================================================
+*/
 
 function nowIndia() {
   return new Intl.DateTimeFormat("en-US", {
@@ -96,24 +133,47 @@ function nowIndia() {
   }).format(new Date());
 }
 
+/*
+========================================================
+REGEX ESCAPE
+========================================================
+*/
+
 function escapeRegExp(text = "") {
-  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return String(text).replace(
+    /[.*+?^${}()|[\]\\]/g,
+    "\\$&"
+  );
 }
+
+/*
+========================================================
+OLD ARTICLE CATEGORY
+========================================================
+*/
 
 function getOldCategory(html = "") {
   for (const category of Object.keys(CATEGORY_FILES)) {
-    const pattern =
-      `<span class="badge">${escapeRegExp(
-        ICONS[category] || "📰"
-      )} ${escapeRegExp(category)}</span>`;
+    const icon = ICONS[category] || "📰";
 
-    if (new RegExp(pattern, "i").test(html)) {
+    const pattern =
+      `<span class="badge">${escapeRegExp(icon)} ${escapeRegExp(category)}</span>`;
+
+    if (
+      new RegExp(pattern, "i").test(html)
+    ) {
       return category;
     }
   }
 
   return "";
 }
+
+/*
+========================================================
+OLD ARTICLE DATE
+========================================================
+*/
 
 function getOldDate(html = "") {
   const match = html.match(
@@ -125,12 +185,16 @@ function getOldDate(html = "") {
     : nowIndia();
 }
 
-/* =========================
-   ROBOTS.TXT
-========================= */
+/*
+========================================================
+ROBOTS.TXT
+========================================================
+*/
 
 function robotsTxt() {
-  return `User-agent: *
+  return `# MANA360 robots.txt
+
+User-agent: *
 Allow: /
 
 Disallow: /api/
@@ -142,9 +206,11 @@ Sitemap: ${SITE_URL}/sitemap.xml
 `;
 }
 
-/* =========================
-   SITEMAP HELPERS
-========================= */
+/*
+========================================================
+SITEMAP
+========================================================
+*/
 
 function sitemapHeader() {
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -157,7 +223,10 @@ function sitemapFooter() {
 }
 
 async function getOrCreateSitemap(env) {
-  const existing = await getFile(env, "sitemap.xml");
+  const existing = await getFile(
+    env,
+    "sitemap.xml"
+  );
 
   if (existing) {
     return existing;
@@ -180,11 +249,21 @@ async function getOrCreateSitemap(env) {
     "Create sitemap.xml"
   );
 
-  return await getFile(env, "sitemap.xml");
+  return await getFile(
+    env,
+    "sitemap.xml"
+  );
 }
 
-function addSitemapEntry(content, url) {
-  if (content.includes(url)) {
+function addSitemapEntry(
+  content,
+  url
+) {
+  if (
+    content.includes(
+      `<loc>${url}</loc>`
+    )
+  ) {
     return content;
   }
 
@@ -202,22 +281,36 @@ function addSitemapEntry(content, url) {
   );
 }
 
-function removeSitemapEntry(content, url) {
-  const escaped = escapeRegExp(url);
+function removeSitemapEntry(
+  content,
+  url
+) {
+  const escaped =
+    escapeRegExp(url);
 
-  const regex = new RegExp(
-    `<url>\\s*<loc>${escaped}<\\/loc>[\\s\\S]*?<\\/url>`,
-    "gi"
+  const regex =
+    new RegExp(
+      `<url>\\s*<loc>${escaped}<\\/loc>[\\s\\S]*?<\\/url>`,
+      "gi"
+    );
+
+  return content.replace(
+    regex,
+    ""
   );
-
-  return content.replace(regex, "");
 }
 
-/* =========================
-   GITHUB
-========================= */
+/*
+========================================================
+GITHUB API
+========================================================
+*/
 
-async function gh(env, path, options = {}) {
+async function gh(
+  env,
+  path,
+  options = {}
+) {
   if (!env.GITHUB_TOKEN) {
     throw new Error(
       "GITHUB_TOKEN is not configured in Cloudflare."
@@ -232,32 +325,56 @@ async function gh(env, path, options = {}) {
     `https://api.github.com/repos/${repo}/contents/${path}`;
 
   const headers = {
-    "Authorization": `Bearer ${env.GITHUB_TOKEN}`,
-    "Accept": "application/vnd.github+json",
-    "X-GitHub-Api-Version": "2022-11-28",
-    "User-Agent": "MANA360-CMS"
+    "Authorization":
+      `Bearer ${env.GITHUB_TOKEN}`,
+
+    "Accept":
+      "application/vnd.github+json",
+
+    "X-GitHub-Api-Version":
+      "2022-11-28",
+
+    "User-Agent":
+      "MANA360-CMS"
   };
 
-  const res = await fetch(url, {
-    ...options,
-    headers: {
-      ...headers,
-      ...(options.headers || {})
-    }
-  });
+  const response =
+    await fetch(
+      url,
+      {
+        ...options,
 
-  const text = await res.text();
+        headers: {
+          ...headers,
+          ...(options.headers || {})
+        }
+      }
+    );
 
-  if (!res.ok) {
+  const text =
+    await response.text();
+
+  if (!response.ok) {
     throw new Error(
-      `GitHub ${res.status}: ${text.slice(0, 500)}`
+      `GitHub ${response.status}: ${text.slice(0, 500)}`
     );
   }
 
-  return text ? JSON.parse(text) : {};
+  return text
+    ? JSON.parse(text)
+    : {};
 }
 
-async function getFile(env, path) {
+/*
+========================================================
+GET FILE FROM GITHUB
+========================================================
+*/
+
+async function getFile(
+  env,
+  path
+) {
   const repo =
     env.GITHUB_REPO ||
     "gullipallivinodkumar-source/mana360";
@@ -270,33 +387,60 @@ async function getFile(env, path) {
     `https://api.github.com/repos/${repo}/contents/${path}?ref=${encodeURIComponent(branch)}`;
 
   const headers = {
-    "Authorization": `Bearer ${env.GITHUB_TOKEN}`,
-    "Accept": "application/vnd.github+json",
-    "X-GitHub-Api-Version": "2022-11-28",
-    "User-Agent": "MANA360-CMS"
+    "Authorization":
+      `Bearer ${env.GITHUB_TOKEN}`,
+
+    "Accept":
+      "application/vnd.github+json",
+
+    "X-GitHub-Api-Version":
+      "2022-11-28",
+
+    "User-Agent":
+      "MANA360-CMS"
   };
 
-  const res = await fetch(url, { headers });
+  const response =
+    await fetch(
+      url,
+      {
+        headers
+      }
+    );
 
-  if (res.status === 404) {
+  if (
+    response.status === 404
+  ) {
     return null;
   }
 
-  const text = await res.text();
+  const text =
+    await response.text();
 
-  if (!res.ok) {
+  if (!response.ok) {
     throw new Error(
-      `GitHub ${res.status}: ${text.slice(0, 500)}`
+      `GitHub ${response.status}: ${text.slice(0, 500)}`
     );
   }
 
-  const j = JSON.parse(text);
+  const json =
+    JSON.parse(text);
 
   return {
-    sha: j.sha,
-    content: b64decode(j.content || "")
+    sha: json.sha,
+
+    content:
+      b64decode(
+        json.content || ""
+      )
   };
 }
+
+/*
+========================================================
+PUT FILE
+========================================================
+*/
 
 async function putFile(
   env,
@@ -311,7 +455,8 @@ async function putFile(
 
   const body = {
     message,
-    content: b64encode(content),
+    content:
+      b64encode(content),
     branch
   };
 
@@ -319,14 +464,28 @@ async function putFile(
     body.sha = sha;
   }
 
-  return gh(env, path, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(body)
-  });
+  return gh(
+    env,
+    path,
+    {
+      method: "PUT",
+
+      headers: {
+        "Content-Type":
+          "application/json"
+      },
+
+      body:
+        JSON.stringify(body)
+    }
+  );
 }
+
+/*
+========================================================
+DELETE FILE
+========================================================
+*/
 
 async function deleteFile(
   env,
@@ -338,22 +497,32 @@ async function deleteFile(
     env.GITHUB_BRANCH ||
     "main";
 
-  return gh(env, path, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      message,
-      sha,
-      branch
-    })
-  });
+  return gh(
+    env,
+    path,
+    {
+      method: "DELETE",
+
+      headers: {
+        "Content-Type":
+          "application/json"
+      },
+
+      body:
+        JSON.stringify({
+          message,
+          sha,
+          branch
+        })
+    }
+  );
 }
 
-/* =========================
-   ARTICLE HTML
-========================= */
+/*
+========================================================
+ARTICLE HTML
+========================================================
+*/
 
 function articleHtml({
   title,
@@ -364,7 +533,8 @@ function articleHtml({
   slug
 }) {
   const icon =
-    ICONS[category] || "📰";
+    ICONS[category] ||
+    "📰";
 
   return `<!doctype html>
 <html lang="te">
@@ -372,166 +542,254 @@ function articleHtml({
 
 <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport"
+content="width=device-width,initial-scale=1">
 
 <title>${esc(title)} | MANA360</title>
 
-<meta name="description" content="${esc(description)}">
+<meta name="description"
+content="${esc(description)}">
 
-<meta name="robots" content="index, follow">
+<meta name="robots"
+content="index, follow">
 
-<link rel="canonical" href="${SITE_URL}/articles/${esc(slug)}.html">
+<link rel="canonical"
+href="${SITE_URL}/articles/${esc(slug)}.html">
 
-<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet"
+href="../assets/style.css">
 
 <style>
 
 .article-wrap{
-  padding:30px 0 70px
+  padding:30px 0 70px;
 }
 
 .article-hero{
-  background:linear-gradient(
-    135deg,
-    #061a43,
-    #0752b8 55%,
-    #08a0ef
-  );
+  background:
+    linear-gradient(
+      135deg,
+      #061a43,
+      #0752b8 55%,
+      #08a0ef
+    );
+
   color:#fff;
+
   border-radius:26px;
+
   padding:42px;
-  box-shadow:0 20px 50px rgba(5,35,90,.18);
-  margin-bottom:25px
+
+  box-shadow:
+    0 20px 50px
+    rgba(5,35,90,.18);
+
+  margin-bottom:25px;
 }
 
 .badge{
   display:inline-block;
+
   background:#ff2b8a;
+
   border-radius:999px;
+
   padding:8px 14px;
+
   font-weight:800;
+
   font-size:13px;
-  margin-bottom:16px
+
+  margin-bottom:16px;
 }
 
 .article-hero h1{
-  font-size:clamp(30px,5vw,48px);
+  font-size:
+    clamp(30px,5vw,48px);
+
   line-height:1.3;
-  margin:0 0 14px
+
+  margin:
+    0 0 14px;
 }
 
 .article-hero p{
   font-size:16px;
+
   line-height:1.9;
+
   color:#e5f1ff;
+
   max-width:900px;
-  margin:0
+
+  margin:0;
 }
 
 .meta{
   margin-top:17px;
+
   color:#c8ddff;
-  font-size:13px
+
+  font-size:13px;
 }
 
 .article-layout{
   display:grid;
-  grid-template-columns:minmax(0,1fr) 290px;
-  gap:24px
+
+  grid-template-columns:
+    minmax(0,1fr) 290px;
+
+  gap:24px;
 }
 
 .article-body{
   background:#fff;
-  border:1px solid #e2e9f3;
+
+  border:
+    1px solid #e2e9f3;
+
   border-radius:20px;
+
   padding:30px;
-  box-shadow:0 10px 30px rgba(10,35,70,.07)
+
+  box-shadow:
+    0 10px 30px
+    rgba(10,35,70,.07);
 }
 
 .article-body h2{
   color:#102d5a;
+
   font-size:25px;
+
   line-height:1.4;
-  margin:28px 0 9px
+
+  margin:
+    28px 0 9px;
+}
+
+.article-body h3{
+  color:#102d5a;
+
+  line-height:1.5;
+
+  margin:
+    22px 0 10px;
 }
 
 .article-body p{
   color:#34465e;
+
   font-size:16px;
+
   line-height:2;
-  margin:0 0 16px
+
+  margin:
+    0 0 16px;
 }
 
 .article-body ul,
 .article-body ol{
   line-height:1.9;
-  color:#34465e
+
+  color:#34465e;
 }
 
 .article-body img{
   max-width:100%;
+
   height:auto;
+
   display:block;
+
   border-radius:14px;
-  margin:20px auto
+
+  margin:
+    20px auto;
 }
 
 .tip{
   background:#eff7ff;
-  border-left:5px solid #0878df;
-  padding:18px 19px;
+
+  border-left:
+    5px solid #0878df;
+
+  padding:
+    18px 19px;
+
   border-radius:12px;
+
   margin:22px 0;
+
   color:#263e5b;
-  line-height:1.9
+
+  line-height:1.9;
 }
 
 .article-side{
   background:#061a43;
+
   color:#fff;
+
   border-radius:20px;
+
   padding:22px;
+
   height:max-content;
+
   position:sticky;
-  top:15px
+
+  top:15px;
 }
 
 .article-side h3{
-  margin:0 0 10px
+  margin:
+    0 0 10px;
 }
 
 .article-side a{
   display:block;
+
   color:#dcecff;
+
   text-decoration:none;
+
   padding:10px 0;
-  border-bottom:1px solid rgba(255,255,255,.13)
+
+  border-bottom:
+    1px solid
+    rgba(255,255,255,.13);
 }
 
 .back{
   display:inline-block;
+
   margin-top:22px;
+
   color:#1262c4;
+
   font-weight:800;
-  text-decoration:none
+
+  text-decoration:none;
 }
 
 @media(max-width:800px){
 
   .article-hero{
-    padding:28px 21px
+    padding:28px 21px;
   }
 
   .article-body{
-    padding:22px 18px
+    padding:
+      22px 18px;
   }
 
   .article-layout{
-    grid-template-columns:1fr
+    grid-template-columns:1fr;
   }
 
   .article-side{
-    position:static
+    position:static;
   }
 
 }
@@ -542,17 +800,23 @@ function articleHtml({
 
 <body>
 
-<main class="container article-wrap">
+<main
+class="container article-wrap">
 
-<section class="article-hero">
+<section
+class="article-hero">
 
 <span class="badge">
 ${icon} ${esc(category)}
 </span>
 
-<h1>${esc(title)}</h1>
+<h1>
+${esc(title)}
+</h1>
 
-<p>${esc(description)}</p>
+<p>
+${esc(description)}
+</p>
 
 <div class="meta">
 MANA360 Team · ${esc(date)}
@@ -562,33 +826,44 @@ MANA360 Team · ${esc(date)}
 
 <div class="article-layout">
 
-<article class="article-body">
+<article
+class="article-body">
 
 ${stripDangerous(content)}
 
 <div class="tip">
 
-<b>ముఖ్యమైన takeaway:</b>
+<b>
+ముఖ్యమైన takeaway:
+</b>
 
-ఈ సమాచారాన్ని మీ అవసరానికి అనుగుణంగా ఉపయోగించండి.
-అవసరమైన చోట reliable sourcesతో verify చేయండి.
+ఈ సమాచారాన్ని మీ అవసరానికి
+అనుగుణంగా ఉపయోగించండి.
+అవసరమైన చోట reliable
+sourcesతో verify చేయండి.
 
 </div>
 
 <a
 class="back"
 href="../categories/${esc(
-  CATEGORY_FILES[category] || "news.html"
-)}"
->
-← ${esc(category)} Categoryకి తిరిగి వెళ్లండి
+  CATEGORY_FILES[category] ||
+  "news.html"
+)}">
+
+← ${esc(category)}
+Categoryకి తిరిగి వెళ్లండి
+
 </a>
 
 </article>
 
-<aside class="article-side">
+<aside
+class="article-side">
 
-<h3>📚 Related Topics</h3>
+<h3>
+📚 Related Topics
+</h3>
 
 <a href="../categories/tech.html">
 📱 Tech
@@ -606,7 +881,7 @@ href="../categories/${esc(
 🎓 Education
 </a>
 
-<a href="../index.html">
+<a href="../">
 🏠 MANA360 Home
 </a>
 
@@ -617,12 +892,15 @@ href="../categories/${esc(
 </main>
 
 </body>
+
 </html>`;
 }
 
-/* =========================
-   HOME CARD
-========================= */
+/*
+========================================================
+HOME CARD
+========================================================
+*/
 
 function homeCard({
   title,
@@ -631,9 +909,12 @@ function homeCard({
   date
 }) {
   const icon =
-    ICONS[category] || "📰";
+    ICONS[category] ||
+    "📰";
 
-  return `<a class="card" href="articles/${esc(slug)}.html">
+  return `<a
+class="card"
+href="articles/${esc(slug)}.html">
 
 <div class="card-image">
 ${icon}
@@ -658,9 +939,11 @@ ${esc(date)}
 </a>`;
 }
 
-/* =========================
-   CATEGORY CARD
-========================= */
+/*
+========================================================
+CATEGORY CARD
+========================================================
+*/
 
 function catCard({
   title,
@@ -669,9 +952,12 @@ function catCard({
   description
 }) {
   const icon =
-    ICONS[category] || "📰";
+    ICONS[category] ||
+    "📰";
 
-  return `<a class="cat-card" href="../articles/${esc(slug)}.html">
+  return `<a
+class="cat-card"
+href="../articles/${esc(slug)}.html">
 
 <div class="cat-card-top">
 ${icon}
@@ -696,9 +982,11 @@ ${esc(description)}
 </a>`;
 }
 
-/* =========================
-   UPLOAD IMAGE
-========================= */
+/*
+========================================================
+UPLOAD IMAGE
+========================================================
+*/
 
 async function uploadImage(
   env,
@@ -709,7 +997,10 @@ async function uploadImage(
     `assets/images/${fileName}`;
 
   const existing =
-    await getFile(env, path);
+    await getFile(
+      env,
+      path
+    );
 
   const repo =
     env.GITHUB_REPO ||
@@ -722,44 +1013,62 @@ async function uploadImage(
   const body = {
     message:
       `Upload image: ${fileName}`,
-    content: base64Data,
+
+    content:
+      base64Data,
+
     branch
   };
 
   if (existing?.sha) {
-    body.sha = existing.sha;
+    body.sha =
+      existing.sha;
   }
 
-  await gh(env, path, {
-    method: "PUT",
-    headers: {
-      "Content-Type":
-        "application/json"
-    },
-    body: JSON.stringify(body)
-  });
+  await gh(
+    env,
+    path,
+    {
+      method: "PUT",
+
+      headers: {
+        "Content-Type":
+          "application/json"
+      },
+
+      body:
+        JSON.stringify(body)
+    }
+  );
 
   return `https://raw.githubusercontent.com/${repo}/${branch}/assets/images/${fileName}`;
 }
 
-/* =========================
-   PUBLISH
-========================= */
+/*
+========================================================
+PUBLISH ARTICLE
+========================================================
+*/
 
-async function publish(env, data) {
-
+async function publish(
+  env,
+  data
+) {
   const title =
-    (data.title || "").trim();
+    String(data.title || "")
+      .trim();
 
   const description =
-    (data.description || "").trim();
+    String(data.description || "")
+      .trim();
 
   const category =
-    (data.category || "").trim();
+    String(data.category || "")
+      .trim();
 
   const content =
     stripDangerous(
-      data.content || ""
+      String(data.content || "")
     ).trim();
 
   if (
@@ -773,7 +1082,9 @@ async function publish(env, data) {
     );
   }
 
-  if (!CATEGORY_FILES[category]) {
+  if (
+    !CATEGORY_FILES[category]
+  ) {
     throw new Error(
       "Invalid category."
     );
@@ -781,7 +1092,8 @@ async function publish(env, data) {
 
   const slug =
     safeSlug(
-      data.slug || title
+      data.slug ||
+      title
     );
 
   if (!slug) {
@@ -823,6 +1135,7 @@ async function publish(env, data) {
   await putFile(
     env,
     articlePath,
+
     articleHtml({
       title,
       description,
@@ -831,10 +1144,15 @@ async function publish(env, data) {
       date,
       slug
     }),
+
     `Publish article: ${title}`
   );
 
-  /* HOME PAGE */
+  /*
+  ========================
+  HOME PAGE
+  ========================
+  */
 
   const index =
     await getFile(
@@ -843,7 +1161,6 @@ async function publish(env, data) {
     );
 
   if (index) {
-
     const marker =
       '<div class="grid">';
 
@@ -864,9 +1181,9 @@ async function publish(env, data) {
         : index.content;
 
     if (
-      updated !== index.content
+      updated !==
+      index.content
     ) {
-
       await putFile(
         env,
         "index.html",
@@ -877,19 +1194,22 @@ async function publish(env, data) {
     }
   }
 
-  /* CATEGORY */
+  /*
+  ========================
+  CATEGORY
+  ========================
+  */
 
-  const catPath =
+  const categoryPath =
     `categories/${CATEGORY_FILES[category]}`;
 
-  const cat =
+  const categoryFile =
     await getFile(
       env,
-      catPath
+      categoryPath
     );
 
-  if (cat) {
-
+  if (categoryFile) {
     const marker =
       '<section class="cat-grid">';
 
@@ -902,28 +1222,34 @@ async function publish(env, data) {
       });
 
     const updated =
-      cat.content.includes(marker)
-        ? cat.content.replace(
+      categoryFile.content.includes(
+        marker
+      )
+        ? categoryFile.content.replace(
             marker,
             marker + card
           )
-        : cat.content;
+        : categoryFile.content;
 
     if (
-      updated !== cat.content
+      updated !==
+      categoryFile.content
     ) {
-
       await putFile(
         env,
-        catPath,
+        categoryPath,
         updated,
         `Add ${title} to ${category} category`,
-        cat.sha
+        categoryFile.sha
       );
     }
   }
 
-  /* SEARCH */
+  /*
+  ========================
+  SEARCH
+  ========================
+  */
 
   const search =
     await getFile(
@@ -932,55 +1258,68 @@ async function publish(env, data) {
     );
 
   if (search) {
-
-    const m =
+    const match =
       search.content.match(
         /const data=(\[.*?\]);/s
       );
 
-    if (m) {
-
+    if (match) {
       try {
+        const array =
+          JSON.parse(
+            match[1]
+          );
 
-        const arr =
-          JSON.parse(m[1]);
-
-        arr.unshift({
+        array.unshift({
           title,
           cat: category,
           icon:
-            ICONS[category] || "📰",
+            ICONS[category] ||
+            "📰",
           slug
         });
 
         const updated =
           search.content.replace(
-            m[0],
+            match[0],
             `const data=${JSON.stringify(
-              arr.slice(0, 100)
+              array.slice(0, 100)
             )};`
           );
 
-        await putFile(
-          env,
-          "search.html",
-          updated,
-          `Add ${title} to search index`,
-          search.sha
+        if (
+          updated !==
+          search.content
+        ) {
+          await putFile(
+            env,
+            "search.html",
+            updated,
+            `Add ${title} to search index`,
+            search.sha
+          );
+        }
+      } catch (error) {
+        console.log(
+          "Search update skipped:",
+          error
         );
-
-      } catch (e) {}
-
+      }
     }
   }
 
-  /* SITEMAP */
+  /*
+  ========================
+  SITEMAP
+  ========================
+  */
 
   const sitemap =
-    await getOrCreateSitemap(env);
+    await getOrCreateSitemap(
+      env
+    );
 
   if (sitemap) {
-
     const articleUrl =
       `${SITE_URL}/articles/${slug}.html`;
 
@@ -991,9 +1330,9 @@ async function publish(env, data) {
       );
 
     if (
-      updated !== sitemap.content
+      updated !==
+      sitemap.content
     ) {
-
       await putFile(
         env,
         "sitemap.xml",
@@ -1006,43 +1345,50 @@ async function publish(env, data) {
 
   return {
     ok: true,
+
     slug,
+
     url:
       `${SITE_URL}/articles/${slug}.html`
   };
 }
 
-/* =========================
-   UPDATE ARTICLE
-========================= */
+/*
+========================================================
+UPDATE ARTICLE
+========================================================
+*/
 
 async function updateArticle(
   env,
   data
 ) {
-
   const oldSlug =
     safeSlug(
       data.oldSlug || ""
     );
 
   const title =
-    (data.title || "").trim();
+    String(data.title || "")
+      .trim();
 
   const description =
-    (data.description || "").trim();
+    String(data.description || "")
+      .trim();
 
   const category =
-    (data.category || "").trim();
+    String(data.category || "")
+      .trim();
 
   const content =
     stripDangerous(
-      data.content || ""
+      String(data.content || "")
     ).trim();
 
   const newSlug =
     safeSlug(
-      data.slug || title
+      data.slug ||
+      title
     );
 
   if (
@@ -1058,7 +1404,9 @@ async function updateArticle(
     );
   }
 
-  if (!CATEGORY_FILES[category]) {
+  if (
+    !CATEGORY_FILES[category]
+  ) {
     throw new Error(
       "Invalid category."
     );
@@ -1089,8 +1437,9 @@ async function updateArticle(
       oldFile.content
     );
 
-  if (newSlug !== oldSlug) {
-
+  if (
+    newSlug !== oldSlug
+  ) {
     const newExisting =
       await getFile(
         env,
@@ -1117,8 +1466,9 @@ async function updateArticle(
   const newPath =
     `articles/${newSlug}.html`;
 
-  if (newSlug === oldSlug) {
-
+  if (
+    newSlug === oldSlug
+  ) {
     await putFile(
       env,
       oldPath,
@@ -1126,9 +1476,7 @@ async function updateArticle(
       `Update article: ${title}`,
       oldFile.sha
     );
-
   } else {
-
     await putFile(
       env,
       newPath,
@@ -1137,7 +1485,11 @@ async function updateArticle(
     );
   }
 
-  /* HOME PAGE */
+  /*
+  ========================
+  HOME
+  ========================
+  */
 
   const index =
     await getFile(
@@ -1146,7 +1498,6 @@ async function updateArticle(
     );
 
   if (index) {
-
     const escaped =
       escapeRegExp(
         oldSlug
@@ -1175,8 +1526,11 @@ async function updateArticle(
         date
       });
 
-    if (updated.includes(marker)) {
-
+    if (
+      updated.includes(
+        marker
+      )
+    ) {
       updated =
         updated.replace(
           marker,
@@ -1185,9 +1539,9 @@ async function updateArticle(
     }
 
     if (
-      updated !== index.content
+      updated !==
+      index.content
     ) {
-
       await putFile(
         env,
         "index.html",
@@ -1198,69 +1552,74 @@ async function updateArticle(
     }
   }
 
-  /* OLD CATEGORY */
+  /*
+  ========================
+  OLD CATEGORY
+  ========================
+  */
 
   if (
     oldCategory &&
     CATEGORY_FILES[oldCategory]
   ) {
-
-    const oldCatPath =
+    const oldCategoryPath =
       `categories/${CATEGORY_FILES[oldCategory]}`;
 
-    const oldCat =
+    const oldCategoryFile =
       await getFile(
         env,
-        oldCatPath
+        oldCategoryPath
       );
 
-    if (oldCat) {
-
+    if (oldCategoryFile) {
       const escaped =
         escapeRegExp(
           oldSlug
         );
 
-      const oldCatRegex =
+      const oldCategoryRegex =
         new RegExp(
           `<a[^>]*class=["']cat-card["'][^>]*href=["']\\.\\./articles/${escaped}\\.html["'][\\s\\S]*?<\\/a>`,
           "i"
         );
 
       const updated =
-        oldCat.content.replace(
-          oldCatRegex,
+        oldCategoryFile.content.replace(
+          oldCategoryRegex,
           ""
         );
 
       if (
-        updated !== oldCat.content
+        updated !==
+        oldCategoryFile.content
       ) {
-
         await putFile(
           env,
-          oldCatPath,
+          oldCategoryPath,
           updated,
           `Remove old article from ${oldCategory}`,
-          oldCat.sha
+          oldCategoryFile.sha
         );
       }
     }
   }
 
-  /* NEW CATEGORY */
+  /*
+  ========================
+  NEW CATEGORY
+  ========================
+  */
 
-  const newCatPath =
+  const newCategoryPath =
     `categories/${CATEGORY_FILES[category]}`;
 
-  const newCat =
+  const newCategoryFile =
     await getFile(
       env,
-      newCatPath
+      newCategoryPath
     );
 
-  if (newCat) {
-
+  if (newCategoryFile) {
     const escaped =
       escapeRegExp(
         newSlug
@@ -1273,7 +1632,7 @@ async function updateArticle(
       );
 
     let updated =
-      newCat.content.replace(
+      newCategoryFile.content.replace(
         existingRegex,
         ""
       );
@@ -1289,8 +1648,11 @@ async function updateArticle(
         description
       });
 
-    if (updated.includes(marker)) {
-
+    if (
+      updated.includes(
+        marker
+      )
+    ) {
       updated =
         updated.replace(
           marker,
@@ -1299,20 +1661,24 @@ async function updateArticle(
     }
 
     if (
-      updated !== newCat.content
+      updated !==
+      newCategoryFile.content
     ) {
-
       await putFile(
         env,
-        newCatPath,
+        newCategoryPath,
         updated,
         `Update ${title} in ${category} category`,
-        newCat.sha
+        newCategoryFile.sha
       );
     }
   }
 
-  /* SEARCH */
+  /*
+  ========================
+  SEARCH
+  ========================
+  */
 
   const search =
     await getFile(
@@ -1321,21 +1687,20 @@ async function updateArticle(
     );
 
   if (search) {
-
-    const m =
+    const match =
       search.content.match(
         /const data=(\[.*?\]);/s
       );
 
-    if (m) {
-
+    if (match) {
       try {
-
-        const arr =
-          JSON.parse(m[1]);
+        const array =
+          JSON.parse(
+            match[1]
+          );
 
         const filtered =
-          arr.filter(
+          array.filter(
             item =>
               item.slug !== oldSlug &&
               item.slug !== newSlug
@@ -1345,22 +1710,23 @@ async function updateArticle(
           title,
           cat: category,
           icon:
-            ICONS[category] || "📰",
+            ICONS[category] ||
+            "📰",
           slug: newSlug
         });
 
         const updated =
           search.content.replace(
-            m[0],
+            match[0],
             `const data=${JSON.stringify(
               filtered.slice(0, 100)
             )};`
           );
 
         if (
-          updated !== search.content
+          updated !==
+          search.content
         ) {
-
           await putFile(
             env,
             "search.html",
@@ -1369,19 +1735,27 @@ async function updateArticle(
             search.sha
           );
         }
-
-      } catch (e) {}
-
+      } catch (error) {
+        console.log(
+          "Search update skipped:",
+          error
+        );
+      }
     }
   }
 
-  /* SITEMAP */
+  /*
+  ========================
+  SITEMAP
+  ========================
+  */
 
   const sitemap =
-    await getOrCreateSitemap(env);
+    await getOrCreateSitemap(
+      env
+    );
 
   if (sitemap) {
-
     const oldUrl =
       `${SITE_URL}/articles/${oldSlug}.html`;
 
@@ -1401,9 +1775,9 @@ async function updateArticle(
       );
 
     if (
-      updated !== sitemap.content
+      updated !==
+      sitemap.content
     ) {
-
       await putFile(
         env,
         "sitemap.xml",
@@ -1414,10 +1788,15 @@ async function updateArticle(
     }
   }
 
-  /* DELETE OLD SLUG */
+  /*
+  ========================
+  DELETE OLD SLUG
+  ========================
+  */
 
-  if (newSlug !== oldSlug) {
-
+  if (
+    newSlug !== oldSlug
+  ) {
     await deleteFile(
       env,
       oldPath,
@@ -1428,39 +1807,149 @@ async function updateArticle(
 
   return {
     ok: true,
-    slug: newSlug,
+
+    slug:
+      newSlug,
+
     url:
       `${SITE_URL}/articles/${newSlug}.html`
   };
 }
 
-/* =========================
-   MAIN WORKER
-========================= */
+/*
+========================================================
+JSON RESPONSE
+========================================================
+*/
+
+function jsonResponse(
+  data,
+  status = 200
+) {
+  return new Response(
+    JSON.stringify(data),
+    {
+      status,
+
+      headers: {
+        "content-type":
+          "application/json; charset=UTF-8",
+
+        "cache-control":
+          "no-store"
+      }
+    }
+  );
+}
+
+/*
+========================================================
+ADMIN AUTH
+========================================================
+*/
+
+function checkAdmin(
+  request,
+  env
+) {
+  if (!env.ADMIN_PASSWORD) {
+    return {
+      ok: false,
+      status: 500,
+      error:
+        "ADMIN_PASSWORD is not configured in Cloudflare."
+    };
+  }
+
+  const password =
+    request.headers.get(
+      "x-admin-password"
+    ) || "";
+
+  if (
+    password !==
+    env.ADMIN_PASSWORD
+  ) {
+    return {
+      ok: false,
+      status: 401,
+      error:
+        "Wrong admin password."
+    };
+  }
+
+  return {
+    ok: true
+  };
+}
+
+/*
+========================================================
+MAIN WORKER
+========================================================
+*/
 
 export default {
 
-  async fetch(request, env) {
+  async fetch(
+    request,
+    env,
+    ctx
+  ) {
 
     const url =
-      new URL(request.url);
+      new URL(
+        request.url
+      );
 
-    /* =========================
-       ROBOTS.TXT
-    ========================= */
+    /*
+    ======================================================
+    CANONICAL DOMAIN REDIRECT
+    mana360.in -> www.mana360.in
+    ======================================================
+    */
 
     if (
-      url.pathname === "/robots.txt" &&
-      request.method === "GET"
+      url.hostname ===
+      "mana360.in"
+    ) {
+
+      const redirectUrl =
+        new URL(
+          request.url
+        );
+
+      redirectUrl.hostname =
+        "www.mana360.in";
+
+      return Response.redirect(
+        redirectUrl.toString(),
+        301
+      );
+    }
+
+    /*
+    ======================================================
+    ROBOTS.TXT
+    ======================================================
+    */
+
+    if (
+      url.pathname ===
+        "/robots.txt" &&
+      request.method ===
+        "GET"
     ) {
 
       return new Response(
         robotsTxt(),
         {
           status: 200,
+
           headers: {
             "content-type":
               "text/plain; charset=UTF-8",
+
             "cache-control":
               "public, max-age=3600"
           }
@@ -1468,13 +1957,17 @@ export default {
       );
     }
 
-    /* =========================
-       SITEMAP.XML
-    ========================= */
+    /*
+    ======================================================
+    SITEMAP.XML
+    ======================================================
+    */
 
     if (
-      url.pathname === "/sitemap.xml" &&
-      request.method === "GET"
+      url.pathname ===
+        "/sitemap.xml" &&
+      request.method ===
+        "GET"
     ) {
 
       try {
@@ -1501,9 +1994,11 @@ export default {
             content,
             {
               status: 200,
+
               headers: {
                 "content-type":
                   "application/xml; charset=UTF-8",
+
                 "cache-control":
                   "public, max-age=3600"
               }
@@ -1515,16 +2010,18 @@ export default {
           sitemap.content,
           {
             status: 200,
+
             headers: {
               "content-type":
                 "application/xml; charset=UTF-8",
+
               "cache-control":
                 "public, max-age=3600"
             }
           }
         );
 
-      } catch (e) {
+      } catch (error) {
 
         return new Response(
           sitemapHeader() +
@@ -1537,6 +2034,7 @@ export default {
           sitemapFooter(),
           {
             status: 200,
+
             headers: {
               "content-type":
                 "application/xml; charset=UTF-8"
@@ -1546,56 +2044,34 @@ export default {
       }
     }
 
-    /* =========================
-       GET ARTICLES
-    ========================= */
+    /*
+    ======================================================
+    GET ARTICLES
+    ======================================================
+    */
 
     if (
-      url.pathname === "/api/articles" &&
-      request.method === "GET"
+      url.pathname ===
+        "/api/articles" &&
+      request.method ===
+        "GET"
     ) {
 
       try {
 
-        const password =
-          request.headers.get(
-            "x-admin-password"
-          ) || "";
-
-        if (!env.ADMIN_PASSWORD) {
-
-          return new Response(
-            JSON.stringify({
-              error:
-                "ADMIN_PASSWORD is not configured in Cloudflare."
-            }),
-            {
-              status: 500,
-              headers: {
-                "content-type":
-                  "application/json"
-              }
-            }
+        const auth =
+          checkAdmin(
+            request,
+            env
           );
-        }
 
-        if (
-          password !==
-          env.ADMIN_PASSWORD
-        ) {
-
-          return new Response(
-            JSON.stringify({
-              error:
-                "Wrong admin password."
-            }),
+        if (!auth.ok) {
+          return jsonResponse(
             {
-              status: 401,
-              headers: {
-                "content-type":
-                  "application/json"
-              }
-            }
+              error:
+                auth.error
+            },
+            auth.status
           );
         }
 
@@ -1609,108 +2085,81 @@ export default {
           );
 
         const articles =
-          (Array.isArray(files)
-            ? files
-            : [])
+          (
+            Array.isArray(files)
+              ? files
+              : []
+          )
             .filter(
-              f =>
-                f.type === "file" &&
-                f.name.endsWith(".html")
+              file =>
+                file.type ===
+                  "file" &&
+                file.name.endsWith(
+                  ".html"
+                )
             )
             .map(
-              f => ({
-                name: f.name,
+              file => ({
+                name:
+                  file.name,
+
                 slug:
-                  f.name.replace(
+                  file.name.replace(
                     /\.html$/,
                     ""
                   ),
+
                 url:
-                  `/articles/${f.name}`
+                  `/articles/${file.name}`
               })
             );
 
-        return new Response(
-          JSON.stringify({
-            ok: true,
-            articles
-          }),
+        return jsonResponse({
+          ok: true,
+          articles
+        });
+
+      } catch (error) {
+
+        return jsonResponse(
           {
-            headers: {
-              "content-type":
-                "application/json"
-            }
-          }
-        );
-
-      } catch (e) {
-
-        return new Response(
-          JSON.stringify({
             error:
-              e.message || String(e)
-          }),
-          {
-            status: 400,
-            headers: {
-              "content-type":
-                "application/json"
-            }
-          }
+              error.message ||
+              String(error)
+          },
+          400
         );
       }
     }
 
-    /* =========================
-       GET SINGLE ARTICLE
-    ========================= */
+    /*
+    ======================================================
+    GET SINGLE ARTICLE
+    ======================================================
+    */
 
     if (
-      url.pathname === "/api/article" &&
-      request.method === "GET"
+      url.pathname ===
+        "/api/article" &&
+      request.method ===
+        "GET"
     ) {
 
       try {
 
-        const password =
-          request.headers.get(
-            "x-admin-password"
-          ) || "";
-
-        if (!env.ADMIN_PASSWORD) {
-
-          return new Response(
-            JSON.stringify({
-              error:
-                "ADMIN_PASSWORD is not configured in Cloudflare."
-            }),
-            {
-              status: 500,
-              headers: {
-                "content-type":
-                  "application/json"
-              }
-            }
+        const auth =
+          checkAdmin(
+            request,
+            env
           );
-        }
 
-        if (
-          password !==
-          env.ADMIN_PASSWORD
-        ) {
-
-          return new Response(
-            JSON.stringify({
-              error:
-                "Wrong admin password."
-            }),
+        if (!auth.ok) {
+          return jsonResponse(
             {
-              status: 401,
-              headers: {
-                "content-type":
-                  "application/json"
-              }
-            }
+              error:
+                auth.error
+            },
+            auth.status
           );
         }
 
@@ -1720,130 +2169,84 @@ export default {
           ) || "";
 
         if (!slug) {
-
-          return new Response(
-            JSON.stringify({
+          return jsonResponse(
+            {
               error:
                 "Slug is required."
-            }),
-            {
-              status: 400,
-              headers: {
-                "content-type":
-                  "application/json"
-              }
-            }
+            },
+            400
           );
         }
 
-        const path =
-          `articles/${safeSlug(slug)}.html`;
+        const cleanSlug =
+          safeSlug(
+            slug
+          );
 
         const file =
           await getFile(
             env,
-            path
+            `articles/${cleanSlug}.html`
           );
 
         if (!file) {
-
-          return new Response(
-            JSON.stringify({
+          return jsonResponse(
+            {
               error:
                 "Article not found."
-            }),
-            {
-              status: 404,
-              headers: {
-                "content-type":
-                  "application/json"
-              }
-            }
+            },
+            404
           );
         }
 
-        return new Response(
-          JSON.stringify({
-            ok: true,
-            content:
-              file.content
-          }),
+        return jsonResponse({
+          ok: true,
+
+          content:
+            file.content
+        });
+
+      } catch (error) {
+
+        return jsonResponse(
           {
-            headers: {
-              "content-type":
-                "application/json"
-            }
-          }
-        );
-
-      } catch (e) {
-
-        return new Response(
-          JSON.stringify({
             error:
-              e.message || String(e)
-          }),
-          {
-            status: 400,
-            headers: {
-              "content-type":
-                "application/json"
-            }
-          }
+              error.message ||
+              String(error)
+          },
+          400
         );
       }
     }
 
-    /* =========================
-       UPLOAD IMAGE
-    ========================= */
+    /*
+    ======================================================
+    UPLOAD IMAGE
+    ======================================================
+    */
 
     if (
-      url.pathname === "/api/upload-image" &&
-      request.method === "POST"
+      url.pathname ===
+        "/api/upload-image" &&
+      request.method ===
+        "POST"
     ) {
 
       try {
 
-        const password =
-          request.headers.get(
-            "x-admin-password"
-          ) || "";
-
-        if (!env.ADMIN_PASSWORD) {
-
-          return new Response(
-            JSON.stringify({
-              error:
-                "ADMIN_PASSWORD is not configured in Cloudflare."
-            }),
-            {
-              status: 500,
-              headers: {
-                "content-type":
-                  "application/json"
-              }
-            }
+        const auth =
+          checkAdmin(
+            request,
+            env
           );
-        }
 
-        if (
-          password !==
-          env.ADMIN_PASSWORD
-        ) {
-
-          return new Response(
-            JSON.stringify({
-              error:
-                "Wrong admin password."
-            }),
+        if (!auth.ok) {
+          return jsonResponse(
             {
-              status: 401,
-              headers: {
-                "content-type":
-                  "application/json"
-              }
-            }
+              error:
+                auth.error
+            },
+            auth.status
           );
         }
 
@@ -1870,7 +2273,6 @@ export default {
           !fileName ||
           !base64
         ) {
-
           throw new Error(
             "Image file and data are required."
           );
@@ -1881,7 +2283,6 @@ export default {
             fileName
           )
         ) {
-
           throw new Error(
             "Only JPG, PNG and WebP images are allowed."
           );
@@ -1894,87 +2295,52 @@ export default {
             base64
           );
 
-        return new Response(
-          JSON.stringify({
-            ok: true,
-            url: imageUrl
-          }),
+        return jsonResponse({
+          ok: true,
+          url: imageUrl
+        });
+
+      } catch (error) {
+
+        return jsonResponse(
           {
-            headers: {
-              "content-type":
-                "application/json"
-            }
-          }
-        );
-
-      } catch (e) {
-
-        return new Response(
-          JSON.stringify({
             error:
-              e.message || String(e)
-          }),
-          {
-            status: 400,
-            headers: {
-              "content-type":
-                "application/json"
-            }
-          }
+              error.message ||
+              String(error)
+          },
+          400
         );
       }
     }
 
-    /* =========================
-       UPDATE ARTICLE
-    ========================= */
+    /*
+    ======================================================
+    UPDATE ARTICLE
+    ======================================================
+    */
 
     if (
-      url.pathname === "/api/update-article" &&
-      request.method === "POST"
+      url.pathname ===
+        "/api/update-article" &&
+      request.method ===
+        "POST"
     ) {
 
       try {
 
-        const password =
-          request.headers.get(
-            "x-admin-password"
-          ) || "";
-
-        if (!env.ADMIN_PASSWORD) {
-
-          return new Response(
-            JSON.stringify({
-              error:
-                "ADMIN_PASSWORD is not configured in Cloudflare."
-            }),
-            {
-              status: 500,
-              headers: {
-                "content-type":
-                  "application/json"
-              }
-            }
+        const auth =
+          checkAdmin(
+            request,
+            env
           );
-        }
 
-        if (
-          password !==
-          env.ADMIN_PASSWORD
-        ) {
-
-          return new Response(
-            JSON.stringify({
-              error:
-                "Wrong admin password."
-            }),
+        if (!auth.ok) {
+          return jsonResponse(
             {
-              status: 401,
-              headers: {
-                "content-type":
-                  "application/json"
-              }
-            }
+              error:
+                auth.error
+            },
+            auth.status
           );
         }
 
@@ -1987,84 +2353,51 @@ export default {
             data
           );
 
-        return new Response(
-          JSON.stringify(result),
-          {
-            headers: {
-              "content-type":
-                "application/json"
-            }
-          }
+        return jsonResponse(
+          result
         );
 
-      } catch (e) {
+      } catch (error) {
 
-        return new Response(
-          JSON.stringify({
-            error:
-              e.message || String(e)
-          }),
+        return jsonResponse(
           {
-            status: 400,
-            headers: {
-              "content-type":
-                "application/json"
-            }
-          }
+            error:
+              error.message ||
+              String(error)
+          },
+          400
         );
       }
     }
 
-    /* =========================
-       PUBLISH ARTICLE
-    ========================= */
+    /*
+    ======================================================
+    PUBLISH ARTICLE
+    ======================================================
+    */
 
     if (
-      url.pathname === "/api/publish" &&
-      request.method === "POST"
+      url.pathname ===
+        "/api/publish" &&
+      request.method ===
+        "POST"
     ) {
 
       try {
 
-        const password =
-          request.headers.get(
-            "x-admin-password"
-          ) || "";
-
-        if (!env.ADMIN_PASSWORD) {
-
-          return new Response(
-            JSON.stringify({
-              error:
-                "ADMIN_PASSWORD is not configured in Cloudflare."
-            }),
-            {
-              status: 500,
-              headers: {
-                "content-type":
-                  "application/json"
-              }
-            }
+        const auth =
+          checkAdmin(
+            request,
+            env
           );
-        }
 
-        if (
-          password !==
-          env.ADMIN_PASSWORD
-        ) {
-
-          return new Response(
-            JSON.stringify({
-              error:
-                "Wrong admin password."
-            }),
+        if (!auth.ok) {
+          return jsonResponse(
             {
-              status: 401,
-              headers: {
-                "content-type":
-                  "application/json"
-              }
-            }
+              error:
+                auth.error
+            },
+            auth.status
           );
         }
 
@@ -2077,40 +2410,48 @@ export default {
             data
           );
 
-        return new Response(
-          JSON.stringify(result),
-          {
-            headers: {
-              "content-type":
-                "application/json"
-            }
-          }
+        return jsonResponse(
+          result
         );
 
-      } catch (e) {
+      } catch (error) {
 
-        return new Response(
-          JSON.stringify({
-            error:
-              e.message || String(e)
-          }),
+        return jsonResponse(
           {
-            status: 400,
-            headers: {
-              "content-type":
-                "application/json"
-            }
-          }
+            error:
+              error.message ||
+              String(error)
+          },
+          400
         );
       }
     }
 
-    /* =========================
-       STATIC ASSETS
-    ========================= */
+    /*
+    ======================================================
+    STATIC WEBSITE
+    ======================================================
+    */
 
-    return env.ASSETS.fetch(
-      request
-    );
+    try {
+
+      return await env.ASSETS.fetch(
+        request
+      );
+
+    } catch (error) {
+
+      return new Response(
+        "Page Not Found",
+        {
+          status: 404,
+
+          headers: {
+            "content-type":
+              "text/plain; charset=UTF-8"
+          }
+        }
+      );
+    }
   }
 };
